@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>深度学习复习题</title>
+<style>
+:root{--bg:#0d1117;--s1:#161b22;--s2:#21262d;--ac:#a78bfa;--ac2:#7c3aed;--green:#3fb950;--red:#f85149;--yellow:#e3b341;--text:#e6edf3;--muted:#8b949e;--border:#30363d;--r:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.page{display:none;min-height:100vh;padding:20px}
+.page.active{display:block}
+/* HOME */
+.home-header{text-align:center;padding:40px 0 30px}
+.home-header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--ac),#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.home-header p{color:var(--muted);font-size:1rem}
+.home-links{text-align:center;margin-bottom:20px}
+.other-quiz-link{display:inline-block;color:var(--muted);font-size:.85rem;border:1px solid var(--border);padding:6px 16px;border-radius:20px;text-decoration:none;transition:all .2s}
+.other-quiz-link:hover{border-color:var(--ac);color:var(--ac)}
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:1100px;margin:0 auto 30px}
+.ch-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.ch-card:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:0 4px 20px rgba(167,139,250,.15)}
+.ch-card h3{font-size:1rem;margin-bottom:6px;color:var(--text)}
+.ch-card .meta{font-size:.82rem;color:var(--muted);margin-bottom:12px}
+.ch-card .progress-wrap{background:var(--s2);border-radius:4px;height:6px;margin-bottom:8px}
+.ch-card .progress-bar{background:linear-gradient(90deg,var(--ac),var(--ac2));height:6px;border-radius:4px;transition:width .4s}
+.ch-card .score-label{font-size:.8rem;color:var(--muted)}
+.ch-card .score-label span{color:var(--ac);font-weight:600}
+.ch-num{position:absolute;top:16px;right:16px;font-size:1.8rem;font-weight:700;color:var(--border)}
+.reset-btn{display:block;margin:0 auto;background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 20px;border-radius:6px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.reset-btn:hover{border-color:var(--red);color:var(--red)}
+/* QUIZ */
+.quiz-topbar{display:flex;align-items:center;gap:12px;max-width:800px;margin:0 auto 16px;padding:0 4px}
+.back-btn{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.85rem;flex-shrink:0}
+.back-btn:hover{border-color:var(--ac)}
+.quiz-title-bar{flex:1;min-width:0}
+.quiz-ch-name{font-size:.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quiz-counter{font-size:.9rem;color:var(--ac);font-weight:600;flex-shrink:0}
+.top-progress{background:var(--s2);height:4px;border-radius:2px;max-width:800px;margin:0 auto 20px}
+.top-progress-fill{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .3s}
+.question-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:24px;max-width:800px;margin:0 auto 16px}
+.type-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;margin-bottom:14px}
+.badge-mc{background:rgba(167,139,250,.15);color:var(--ac);border:1px solid rgba(167,139,250,.3)}
+.badge-fill{background:rgba(227,179,65,.12);color:var(--yellow);border:1px solid rgba(227,179,65,.3)}
+.badge-qa{background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.3)}
+.badge-prog{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.3)}
+.q-text{font-size:1rem;line-height:1.7;margin-bottom:18px;color:var(--text)}
+.q-text code{background:var(--s2);padding:1px 6px;border-radius:4px;font-family:'Cascadia Code','Consolas',monospace;font-size:.88em;color:#79c0ff}
+.q-text pre{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:14px;margin:10px 0;overflow-x:auto;font-family:'Cascadia Code','Consolas',monospace;font-size:.85em;line-height:1.6;color:#e6edf3}
+.q-text pre code{background:none;padding:0;font-size:1em;color:inherit}
+/* MC options */
+.options{display:flex;flex-direction:column;gap:10px}
+.opt-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;text-align:left;font-size:.95rem;color:var(--text);transition:all .2s;display:flex;align-items:flex-start;gap:10px}
+.opt-btn:hover:not(.disabled){border-color:var(--ac);background:rgba(167,139,250,.07)}
+.opt-btn.disabled{cursor:default}
+.opt-btn.correct{border-color:var(--green);background:rgba(63,185,80,.12);color:var(--green)}
+.opt-btn.wrong{border-color:var(--red);background:rgba(248,81,73,.1);color:var(--red)}
+.opt-key{font-weight:700;flex-shrink:0;min-width:22px}
+/* Fill */
+.fill-area{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.fill-input{flex:1;min-width:200px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-size:.95rem;outline:none}
+.fill-input:focus{border-color:var(--ac)}
+.fill-input.correct{border-color:var(--green);background:rgba(63,185,80,.08)}
+.fill-input.wrong{border-color:var(--red);background:rgba(248,81,73,.08)}
+.submit-btn{background:var(--ac2);color:#fff;border:none;border-radius:6px;padding:10px 20px;cursor:pointer;font-size:.9rem;font-weight:600;transition:background .2s}
+.submit-btn:hover{background:var(--ac)}
+.submit-btn:disabled{opacity:.4;cursor:default}
+.reveal-btn{background:var(--s2);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:10px 16px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.reveal-btn:hover{border-color:var(--yellow);color:var(--yellow)}
+/* QA / Prog */
+.answer-reveal{margin-top:12px}
+.answer-box{background:var(--s2);border:1px solid rgba(63,185,80,.3);border-radius:8px;padding:16px;margin-top:10px;display:none;line-height:1.8;font-size:.92rem;color:var(--text)}
+.answer-box.show{display:block}
+.answer-box pre{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;margin:10px 0;overflow-x:auto;font-family:'Cascadia Code','Consolas',monospace;font-size:.82em;line-height:1.6;color:#e6edf3;white-space:pre}
+.answer-box code{background:rgba(121,192,255,.1);padding:1px 6px;border-radius:3px;font-family:'Cascadia Code','Consolas',monospace;font-size:.9em;color:#79c0ff}
+.show-ans-btn{background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.3);color:var(--green);border-radius:6px;padding:10px 20px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s;margin-top:8px;display:inline-block}
+.show-ans-btn:hover{background:rgba(63,185,80,.2)}
+/* Feedback */
+.feedback-panel{max-width:800px;margin:0 auto 16px;border-radius:var(--r);padding:14px 18px;display:none;border:1px solid var(--border)}
+.feedback-panel.show{display:block}
+.feedback-panel.correct{border-color:rgba(63,185,80,.4);background:rgba(63,185,80,.07)}
+.feedback-panel.wrong{border-color:rgba(248,81,73,.4);background:rgba(248,81,73,.07)}
+.feedback-panel.neutral{border-color:rgba(227,179,65,.35);background:rgba(227,179,65,.07)}
+.fb-title{font-weight:700;margin-bottom:6px;font-size:.95rem}
+.fb-ans{font-size:.9rem;margin-bottom:6px;color:var(--text)}
+.fb-ans strong{color:var(--green)}
+.fb-exp{font-size:.88rem;line-height:1.6;color:var(--muted)}
+/* Nav */
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;padding-bottom:30px}
+.nav-btn{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:10px 22px;border-radius:8px;cursor:pointer;font-size:.9rem;transition:all .2s}
+.nav-btn:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.nav-btn:disabled{opacity:.35;cursor:default}
+.nav-btn.primary{background:var(--ac2);border-color:var(--ac2);color:#fff}
+.nav-btn.primary:hover:not(:disabled){background:var(--ac)}
+/* Results */
+.results-wrap{max-width:700px;margin:0 auto;padding:30px 0}
+.results-title{text-align:center;font-size:1.8rem;font-weight:700;margin-bottom:6px}
+.results-score{text-align:center;font-size:3.5rem;font-weight:700;color:var(--ac);margin:16px 0 4px}
+.results-sub{text-align:center;color:var(--muted);margin-bottom:28px}
+.ch-result-row{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ch-result-row .ch-score{font-weight:600;color:var(--ac)}
+.wrong-section{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:24px}
+.wrong-section h3{margin-bottom:14px;color:var(--yellow)}
+.wrong-item{padding:10px 0;border-bottom:1px solid var(--border);font-size:.88rem}
+.wrong-item:last-child{border-bottom:none}
+.wrong-item .wi-q{color:var(--muted);margin-bottom:4px}
+.wrong-item .wi-ans{color:var(--green)}
+.results-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.results-btns button{padding:10px 24px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;border:none}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="home-header">
+    <h1>深度学习复习题</h1>
+    <p>共 4 章节 · 43 道题 · 含即时反馈与解析</p>
+  </div>
+  <div class="home-links">
+    <a class="other-quiz-link" href="quiz.html">← 切换到 OpenCV 复习题</a>
+  </div>
+  <div class="chapter-grid" id="chapter-grid"></div>
+  <div style="text-align:center;padding-bottom:40px">
+    <button class="reset-btn" onclick="resetAll()">重置所有答题记录</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="page-quiz" class="page">
+  <div class="quiz-topbar">
+    <button class="back-btn" onclick="goHome()">← 章节</button>
+    <div class="quiz-title-bar">
+      <div class="quiz-ch-name" id="quiz-ch-name"></div>
+    </div>
+    <div class="quiz-counter" id="quiz-counter"></div>
+  </div>
+  <div class="top-progress"><div class="top-progress-fill" id="top-prog-fill"></div></div>
+  <div class="question-card">
+    <span class="type-badge" id="type-badge"></span>
+    <div class="q-text" id="q-text"></div>
+    <div id="q-body"></div>
+  </div>
+  <div class="feedback-panel" id="feedback-panel">
+    <div class="fb-title" id="fb-title"></div>
+    <div class="fb-ans" id="fb-ans"></div>
+    <div class="fb-exp" id="fb-exp"></div>
+  </div>
+  <div class="quiz-nav">
+    <button class="nav-btn" id="btn-prev" onclick="prevQ()">← 上一题</button>
+    <button class="nav-btn primary" id="btn-next" onclick="nextQ()">下一题 →</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="page-results" class="page">
+  <div class="results-wrap">
+    <div class="results-title">答题完成！</div>
+    <div class="results-score" id="res-score"></div>
+    <div class="results-sub" id="res-sub"></div>
+    <div id="ch-results"></div>
+    <div class="wrong-section" id="wrong-section" style="display:none">
+      <h3>错题回顾</h3>
+      <div id="wrong-list"></div>
+    </div>
+    <div class="results-btns">
+      <button style="background:var(--s2);color:var(--text);border:1px solid var(--border)" onclick="goHome()">返回主页</button>
+      <button style="background:var(--ac2);color:#fff" onclick="redoChapter()">重做本章</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CHAPTERS = [
+{
+  id:'mc', title:'一、单选题',
+  questions:[
+    {type:'mc',q:'大脑是由很多个叫做神经元的东西构成，每一个神经元都有输入、处理函数和输出。神经元组合起来形成了网络，可以拟合任何函数。给定上述关于神经网络的描述，什么情况下神经网络模型被称为深度学习模型？',
+     opts:['加入更多层，使神经网络的深度增加','有维度更高的数据','当这是一个图形识别的问题时','以上都不正确'],
+     ans:0,exp:'深度学习 = 深层（多层）神经网络。网络深度增加（层数更多），才构成深度学习模型。'},
+    {type:'mc',q:'下列哪一项在神经网络中引入了非线性？',
+     opts:['随机梯度下降','激活函数','卷积函数','以上都不正确'],
+     ans:1,exp:'激活函数（如 ReLU、Sigmoid、Tanh）引入非线性变换，使神经网络能拟合复杂非线性数据。'},
+    {type:'mc',q:'下列哪项关于模型能力的描述是正确的？',
+     opts:['Dropout 的比例增加，模型能力增加','学习率增加，模型能力增加','隐藏层层数增加，模型能力增加','都不正确'],
+     ans:2,exp:'隐藏层层数增加 → 模型参数增多 → 模型拟合能力（容量）增加。Dropout 是正则化手段会降低有效容量；学习率不直接影响模型能力。'},
+    {type:'mc',q:'下列哪个函数不可以做激活函数？',
+     opts:['y = tanh(x)','y = sin(x)','y = max(x, 0)','y = 2x'],
+     ans:3,exp:'y = 2x 是线性函数，无法引入非线性，叠加后仍是线性变换，失去深度网络的意义。其余均为非线性函数。'},
+    {type:'mc',q:'TensorFlow 的特点有哪些？',
+     opts:['灵活性','可移植性','多语言支持','以上都是'],
+     ans:3,exp:'TensorFlow 兼具灵活性（支持研究和生产）、可移植性（跨平台）和多语言支持（Python/C++/Java 等）。'},
+    {type:'mc',q:'如下代码的运行结果是：\n<pre><code>x = tf.constant([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])\nx[0, 1]</code></pre>',
+     opts:['2','4','10','9'],
+     ans:0,exp:'x[0, 1] 表示第0行第1列，即第一行 [1,2,3] 中索引为1的元素，结果为 2。'},
+    {type:'mc',q:'对于前向神经网络，输入层节点数为 10，隐藏层为 5。从输入层到隐藏层的连接数是：',
+     opts:['小于 50','50','任意值','大于 50'],
+     ans:1,exp:'全连接情况下，10个输入节点 × 5个隐藏节点 = 50 条连接（不计偏置）。'},
+    {type:'mc',q:'有如下代码，运行后张量 z 的形状是：\n<pre><code>x = tf.random.normal((4, 3))\ny = tf.random.normal((3, 2))\nz = x * y</code></pre>',
+     opts:['z.shape = (4, 3)','z.shape = (3, 3)','z.shape = (4, 2)','运行出错，因为两个张量维度不匹配'],
+     ans:3,exp:'* 是逐元素乘法，要求两个张量形状相同。(4,3) 和 (3,2) 形状不同，无法广播，运行时会报错。'},
+    {type:'mc',q:'在卷积神经网络中，随着网络加深，能看到的现象是？',
+     opts:['特征图高度和宽度增加，同时通道数减少','特征图高度和宽度减少，同时通道数减少','特征图高度和宽度增加，同时通道数增加','特征图高度和宽度减少，同时通道数增加'],
+     ans:3,exp:'随网络加深：卷积和池化使特征图空间尺寸（高×宽）缩小；同时使用更多卷积核，通道数增加，提取更丰富的特征。'},
+    {type:'mc',q:'假设输入尺寸为 64×64×16，单个 1×1 的卷积核含有多少个参数（包括偏差）？',
+     opts:['2','4097','17','1'],
+     ans:2,exp:'1×1 卷积核参数 = 输入通道数 × 1 × 1 + 1（偏置）= 16 + 1 = 17。'},
+    {type:'mc',q:'有一个 32×32×16 的输入，并使用步幅为 2、过滤器大小为 2 的最大化池化，请问输出是多少？',
+     opts:['5×15×16','16×16×8','16×16×16','32×32×8'],
+     ans:2,exp:'池化后尺寸 = (32 - 2) / 2 + 1 = 16；通道数不变 = 16。输出为 16×16×16。'},
+    {type:'mc',q:'卷积神经网络 VGG16 名称中 16 指的是：',
+     opts:['论文发表于 2016 年','网络总共有 16 层','网络有 16 层的参数需要训练','VGG 发表的第 16 代网络'],
+     ans:2,exp:'VGG16 的 16 指网络中含有可训练参数的层数为 16 层（13个卷积层 + 3个全连接层）。'},
+    {type:'mc',q:'CNN 的全称是？',
+     opts:['循环神经网络','卷积神经网络','全连接神经网络','对抗生成神经网络'],
+     ans:1,exp:'CNN = Convolutional Neural Network，卷积神经网络。RNN = 循环神经网络，GAN = 对抗生成网络。'},
+    {type:'mc',q:'TensorFlow 中张量运算操作函数 tf.add 的作用是：',
+     opts:['张量乘法','张量减法','张量加法','张量变换'],
+     ans:2,exp:'tf.add(a, b) 执行逐元素张量加法，等价于 a + b。'},
+    {type:'mc',q:'构建一个用于识别猫与狗分类的神经网络。对于输出层，使用哪种激活函数？',
+     opts:['ReLU','Leaky ReLU','Sigmoid','Tanh'],
+     ans:2,exp:'猫狗分类是二分类任务，输出层使用 Sigmoid，将输出压缩到 (0,1) 表示概率。ReLU 用于中间层激活。'},
+    {type:'mc',q:'如果张量 X 的形状属性是 (4, 1, 2, 1)，那么经过 <code>tf.squeeze(x)</code> 操作后，其结果的形状属性是：',
+     opts:['(4, 2, 1)','(4, 1, 2, 1)','(4, 2)','(4, 1, 2)'],
+     ans:2,exp:'tf.squeeze 移除所有维度为 1 的轴。(4, 1, 2, 1) → 移除第1维和第3维（都是1）→ (4, 2)。'},
+    {type:'mc',q:'神经网络由许多神经元组成，请问下列关于神经元的描述中，哪一项是正确的？',
+     opts:['每个神经元可以有一个输入和一个输出','每个神经元可以有多个输入和一个输出','每个神经元可以有一个输入和多个输出','每个神经元可以有多个输入和多个输出'],
+     ans:1,exp:'标准神经元接受多个输入（加权求和），经激活函数后产生一个输出。'},
+    {type:'mc',q:'ReLU 激活函数的表达式是？',
+     opts:['y = x','y = max(x, 0)','y = min(x, 0)','y = max(0.1x, x)'],
+     ans:1,exp:'ReLU (Rectified Linear Unit)：y = max(x, 0)，正值不变，负值置零。最后一项是 Leaky ReLU。'},
+    {type:'mc',q:'对于 5×5×16 的图像输入，使用 3×3 的 8 个卷积核进行卷积，其步幅为 1 和填充为 0，请问最终输出图像是多少？',
+     opts:['3×3×8','4×4×16','5×5×8','3×3×16'],
+     ans:0,exp:'输出尺寸 = (5 - 3 + 0×2) / 1 + 1 = 3。卷积核数量 = 8 个，决定输出通道数。结果为 3×3×8。'},
+    {type:'mc',q:'反向传播算法计算什么值的梯度，并将其反向传播？',
+     opts:['预测结果与样本标签之间的误差','各个输入样本的平方差之和','各个网络权重的平方差之和','都不对'],
+     ans:0,exp:'反向传播计算损失函数（预测结果与真实标签的误差）对每个权重的梯度，然后通过链式法则向输入层方向传播。'},
+    {type:'mc',q:'下列哪一项属于特征学习算法？',
+     opts:['K 近邻算法','随机森林','神经网络','都不属于'],
+     ans:2,exp:'神经网络能自动从数据中学习特征表示（特征学习），无需人工手动设计特征。KNN 和随机森林依赖手工特征。'},
+    {type:'mc',q:'深度学习中开发和测试集应该：',
+     opts:['来自同一分布','来自不同分布','完全相同','数据数量应该相同'],
+     ans:0,exp:'开发集（验证集）和测试集必须来自同一分布，否则模型在开发集上的表现无法代表测试集的真实性能。'},
+    {type:'mc',q:'如果希望预测 k 个类（p1, p2 … pk）的概率，使得所有 p 的和等于 1，那么哪个函数可以用作输出层激活函数？',
+     opts:['Softmax','ReLU','Sigmoid','Tanh'],
+     ans:0,exp:'Softmax 将输出转化为概率分布，所有输出之和为 1，专用于多分类问题。Sigmoid 用于二分类。'},
+    {type:'mc',q:'如果使用的学习率太大，会导致：',
+     opts:['网络收敛的快','网络收敛的慢','网络无法收敛','不确定'],
+     ans:2,exp:'学习率太大会导致梯度下降步伐过大，越过最优点，导致损失函数震荡甚至发散，无法收敛。'},
+    {type:'mc',q:'Keras 中卷积层的函数是：',
+     opts:['Conv2D','MaxPooling2D','Dense','Flatten'],
+     ans:0,exp:'Conv2D 是 Keras 中的 2D 卷积层；MaxPooling2D 是池化层；Dense 是全连接层；Flatten 是展平层。'},
+    {type:'mc',q:'设计多分类神经网络，输出层应使用何种激活函数？',
+     opts:['ReLU','Tanh','Sigmoid','Softmax'],
+     ans:3,exp:'多分类问题输出层使用 Softmax，将输出归一化为各类别的概率分布。'},
+    {type:'mc',q:'在神经网络中，如果知道神经元准确的权重和偏差，便可以近似拟合任何函数，但如何计算得出各个权重和偏差呢？',
+     opts:['搜索每个可能的权重和偏差组合，直到得到最佳值','赋予一个初始值，然后不断迭代调整权重','随机赋值，听天由命','以上都不正确'],
+     ans:1,exp:'先随机初始化权重，再通过前向传播计算损失，反向传播计算梯度，利用梯度下降不断迭代更新权重直至收敛。'},
+    {type:'mc',q:'假设神经元的输入值为 (1, 2, 3)，对应的权重为 (4, 5, 6)，神经元经过一个线性函数 y=2x，最终的输出结果是多少？',
+     opts:['48','32','64','96'],
+     ans:2,exp:'加权求和 = 1×4 + 2×5 + 3×6 = 4 + 10 + 18 = 32；经过 y=2x → 2 × 32 = 64。'},
+    {type:'mc',q:'在神经网络中，"梯度消失"问题的主要来源是：',
+     opts:['被 Dropout 丢弃','被 Pooling 丢弃','梯度为负数','梯度趋近于零'],
+     ans:3,exp:'梯度消失指反向传播时梯度在多层网络中逐层相乘，不断缩小趋近于零，导致前层权重几乎无法更新。Sigmoid/Tanh 饱和区域易引发此问题。'},
+  ]
+},
+{
+  id:'fill', title:'二、填空题',
+  questions:[
+    {type:'fill',q:'梯度下降算法主要分为（　　）、小批量梯度下降、（　　）三种。（请填写另外两种方式，用逗号分隔）',
+     ans:['批量梯度下降，随机梯度下降','批量梯度下降,随机梯度下降'],
+     exp:'三种梯度下降：①批量梯度下降（全部样本）②小批量梯度下降（mini-batch）③随机梯度下降（单个样本）。'},
+    {type:'fill',q:'TensorFlow 中张量的形状属性名称是（　　）',
+     ans:['shape'],exp:'tensor.shape 返回张量的形状，如 TensorShape([4, 3])。'},
+    {type:'fill',q:'激活函数 ReLU 的定义是（　　）',
+     ans:['max(x,0)','max(x, 0)','relu(x)=max(x,0)'],exp:'ReLU(x) = max(x, 0)，大于0保留，小于等于0置零。'},
+    {type:'fill',q:'计算机视觉技术方向主要分为（　　）、（　　）、（　　）（请用逗号分隔填写三个方向）',
+     ans:['图像分类，目标检测，语义分割','图像分类,目标检测,语义分割'],
+     exp:'图像分类（分类整张图）、目标检测（定位+分类）、语义分割（像素级分类）。'},
+    {type:'fill',q:'Keras 中卷积层的 padding 参数值可以为（　　）或（　　）（请用逗号分隔）',
+     ans:['same，valid','same,valid','valid，same','valid,same'],
+     exp:'same：填充使输出尺寸与输入相同；valid：不填充，输出尺寸会缩小。'},
+    {type:'fill',q:'用于图像像素级分类的技术名称是（　　）',
+     ans:['语义分割'],exp:'语义分割（Semantic Segmentation）对图像中每个像素分配类别标签，实现像素级分类。'},
+  ]
+},
+{
+  id:'qa', title:'三、简答题',
+  questions:[
+    {type:'qa',q:'请说明卷积神经网络中卷积层、池化层、上采样层的用途。',
+     ans:`<strong>卷积层：</strong>利用卷积核滑动提取图像局部纹理、边缘等特征，权值共享减少参数，保留图像空间结构，生成多通道特征图。<br><br>
+<strong>池化层：</strong>压缩特征图长宽，减少计算量；筛选区域关键特征，增强模型平移不变性，降低过拟合。<br><br>
+<strong>上采样层：</strong>放大低分辨率特征图尺寸，恢复丢失的空间细节，常用于图像分割、图像生成网络，实现像素级输出。`},
+    {type:'qa',q:'请说明为什么需要在神经网络中引入激活函数？列出至少 3 种常用激活函数及其特点。',
+     ans:`<strong>为什么需要激活函数：</strong>加入激活函数是为了引入非线性因素，解决线性模型所不能解决的问题。若没有激活函数，无论多少层全连接网络本质上仍是线性变换，无法拟合复杂非线性数据。<br><br>
+<strong>常用激活函数：</strong><br>
+① <code>Sigmoid(x) = 1/(1+e^-x)</code>：输出范围 (0,1)，常用于二分类输出层，但在深层网络中易出现梯度消失。<br>
+② <code>Tanh(x) = (e^x - e^-x)/(e^x + e^-x)</code>：输出范围 (-1,1)，零中心化，比 Sigmoid 收敛更快，但仍有梯度消失问题。<br>
+③ <code>ReLU(x) = max(0, x)</code>：计算简单，解决了梯度消失问题，是目前最常用的激活函数；但负数区域梯度为0（"神经元死亡"问题）。`},
+    {type:'qa',q:'请说明卷积神经网络的结构，并说明主要组成部分功能。',
+     ans:`卷积神经网络主要由以下层构成：<br><br>
+<strong>① 输入层：</strong>接收原始图像数据，完成归一化、维度调整等预处理。<br>
+<strong>② 卷积层（核心）：</strong>通过滑动卷积核提取图像边缘、纹理等局部特征；权值共享减少参数量，输出多通道特征图。<br>
+<strong>③ 激活层：</strong>引入非线性变换，让网络能够拟合复杂数据，常用 ReLU、Sigmoid 等。<br>
+<strong>④ 池化层：</strong>压缩特征图长宽，降低计算量；筛选关键特征，提升模型平移不变性，抑制过拟合。<br>
+<strong>⑤ 全连接层：</strong>将二维特征图展平为一维向量，整合全局特征，最后输出分类或预测结果。`},
+    {type:'qa',q:'请说明卷积神经网络最大池化层和平均池化层的作用和计算方式。',
+     ans:`<strong>最大池化（Max Pooling）：</strong><br>
+计算方式：将特征图划分为多个池化窗口，取窗口内所有数值的<strong>最大值</strong>作为输出。<br>
+作用：保留区域内最突出的特征，对轻微偏移、噪声有一定的鲁棒性。<br><br>
+<strong>平均池化（Average Pooling）：</strong><br>
+计算方式：将特征图划分为多个池化窗口，取窗口内所有数值的<strong>平均值</strong>作为输出。<br>
+作用：平滑特征区域，保留整体信息，降低局部极值带来的干扰，常用于网络末端的全局平均池化。`},
+    {type:'qa',q:'请描述图像标注对于深度学习任务的作用，列举常见的图像标注方法。',
+     ans:`<strong>作用：</strong>给图像添加真实标签，构建监督学习数据集，让模型学习图像与语义的对应关系，支撑训练、验证与评测各类视觉任务。没有标注数据，监督学习无法进行。<br><br>
+<strong>常见标注方法：</strong><br>
+① <strong>图像分类标注：</strong>给整张图像打一个类别标签（如"猫"/"狗"）。<br>
+② <strong>矩形框标注（目标检测）：</strong>用矩形框标出目标位置，并标注类别。<br>
+③ <strong>像素分割标注（语义分割）：</strong>对图像中每个像素标注类别（精细轮廓）。<br>
+④ <strong>关键点标注：</strong>标注人体姿态、面部特征点等关键位置坐标。`},
+  ]
+},
+{
+  id:'prog', title:'四、程序设计题',
+  questions:[
+    {type:'prog',q:'请写出 ResNet 中 BasicBlock 残差块的实现代码。',
+     ans:`<pre>class BasicBlock(layers.Layer):
+    def __init__(self, kernel_num, stride=1):
+        super(BasicBlock, self).__init__()
+        # 第一个卷积层
+        self.conv1 = layers.Conv2D(kernel_num, (3,3), strides=stride, padding='same')
+        self.bn1   = layers.BatchNormalization()
+        self.relu  = layers.Activation('relu')
+        # 第二个卷积层
+        self.conv2 = layers.Conv2D(kernel_num, (3,3), strides=1, padding='same')
+        self.bn2   = layers.BatchNormalization()
+        # 下采样（当 stride != 1 时对齐维度）
+        self.downsample = layers.Conv2D(kernel_num, (1,1), strides=stride)
+
+    def call(self, inputs):
+        x = self.conv1(inputs)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.conv2(x)
+        out = self.bn2(x)
+
+        # 残差连接
+        if out.shape != inputs.shape:
+            identity = self.downsample(inputs)
+        else:
+            identity = inputs
+
+        output = layers.add([out, identity])
+        output = tf.nn.relu(output)  # 最终非线性激活
+        return output</pre>
+<strong>关键点：</strong>残差块的核心是 <code>output = out + identity</code>，将输入直接加到输出上，解决深层网络的梯度消失/爆炸问题。`},
+    {type:'prog',q:'下图是 LeNet 的网络结构，请用 Keras 构建出 LeNet 模型（基于 MNIST 手写数字数据集）。',
+     ans:`<pre>import numpy as np
+import tensorflow as tf
+
+# 数据获取和预处理
+(train_data, train_label), (test_data, test_label) = tf.keras.datasets.mnist.load_data()
+train_data = train_data / 255.0  # 归一化到 [0,1]
+test_data  = test_data  / 255.0
+
+# 构建 LeNet 模型
+model = tf.keras.models.Sequential([
+    # 第1个卷积层：6个 5×5 卷积核，valid 填充，ReLU 激活
+    tf.keras.layers.Conv2D(filters=6, kernel_size=(5,5), padding='valid',
+                           input_shape=(28,28,1), activation='relu'),
+    # 第1个池化层：2×2 最大池化
+    tf.keras.layers.MaxPooling2D(pool_size=(2,2)),
+    # 第2个卷积层：16个 5×5 卷积核
+    tf.keras.layers.Conv2D(filters=16, kernel_size=(5,5), activation='relu'),
+    # 第2个池化层
+    tf.keras.layers.MaxPooling2D(pool_size=(2,2)),
+    # 展平
+    tf.keras.layers.Flatten(),
+    # 全连接层
+    tf.keras.layers.Dense(120, activation='relu'),
+    tf.keras.layers.Dense(84,  activation='relu'),
+    # 输出层：10类（0-9）
+    tf.keras.layers.Dense(10,  activation='softmax')
+])
+
+# 编译
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# 训练
+model.fit(train_data, train_label, epochs=5)
+
+# 评估
+loss, accuracy = model.evaluate(test_data, test_label)</pre>`},
+    {type:'prog',q:'请描述下列 LeNet 代码各部分的作用。\n<pre><code>model = tf.keras.models.Sequential([\n    tf.keras.layers.Conv2D(filters=6, kernel_size=(5,5), padding=\'valid\', input_shape=(28,28,1), activation=\'relu\'),\n    tf.keras.layers.MaxPooling2D(pool_size=(2,2)),\n    tf.keras.layers.Conv2D(filters=16, kernel_size=(5,5), activation=\'relu\'),\n    tf.keras.layers.MaxPooling2D(pool_size=(2,2)),\n    tf.keras.layers.Flatten(),\n    tf.keras.layers.Dense(120, activation=\'relu\'),\n    tf.keras.layers.Dense(84, activation=\'relu\'),\n    tf.keras.layers.Dense(10, activation=\'softmax\')\n])\nmodel.compile(optimizer=\'adam\', loss=\'sparse_categorical_crossentropy\', metrics=[\'accuracy\'])\nmodel.fit(train_data, train_label, epochs=5)</code></pre>',
+     ans:`<strong>各层作用：</strong><br><br>
+① <code>Conv2D(6, (5,5), padding='valid')</code>：第1卷积层，用6个5×5卷积核提取边缘等低级特征；valid不填充，输出从28×28变为24×24×6。<br>
+② <code>MaxPooling2D((2,2))</code>：第1池化层，2×2最大池化，特征图缩小为12×12×6。<br>
+③ <code>Conv2D(16, (5,5))</code>：第2卷积层，用16个卷积核提取更复杂的特征，输出8×8×16。<br>
+④ <code>MaxPooling2D((2,2))</code>：第2池化层，输出4×4×16。<br>
+⑤ <code>Flatten()</code>：展平层，将4×4×16=256维特征图拉成一维向量。<br>
+⑥ <code>Dense(120, relu)</code>：全连接层，整合全局特征，输出120维。<br>
+⑦ <code>Dense(84, relu)</code>：全连接层，输出84维。<br>
+⑧ <code>Dense(10, softmax)</code>：输出层，10类概率分布（0-9数字）。<br><br>
+<strong>model.compile：</strong>配置优化器(adam)、损失函数(稀疏交叉熵)和评估指标(准确率)。<br>
+<strong>model.fit：</strong>用训练数据训练5轮(epochs=5)。`},
+  ]
+}
+];
+
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+let state = {chIdx:0, qIdx:0, answered:false};
+let answers = {};
+
+function loadData(){ try{ answers=JSON.parse(localStorage.getItem('dl_answers')||'{}'); }catch(e){} }
+function saveData(){ localStorage.setItem('dl_answers', JSON.stringify(answers)); }
+
+// ─────────────────────────────────────────
+// PAGE NAV
+// ─────────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome(){ renderHome(); showPage('home'); }
+function resetAll(){
+  if(!confirm('确定要重置所有答题记录吗？')) return;
+  answers={};
+  saveData();
+  renderHome();
+}
+
+// ─────────────────────────────────────────
+// HOME
+// ─────────────────────────────────────────
+const CH_ICONS = ['①','②','③','④'];
+function renderHome(){
+  const grid = document.getElementById('chapter-grid');
+  grid.innerHTML = '';
+  CHAPTERS.forEach((ch,i)=>{
+    const total = ch.questions.length;
+    const done = ch.questions.filter((_,qi)=>answers[ch.id+'-'+qi]!==undefined).length;
+    const correct = ch.questions.filter((_,qi)=>{const a=answers[ch.id+'-'+qi];return a&&a.correct;}).length;
+    const pct = total ? Math.round(done/total*100) : 0;
+    const card = document.createElement('div');
+    card.className='ch-card'; card.onclick=()=>startChapter(i);
+    card.innerHTML=`
+      <div class="ch-num">${CH_ICONS[i]}</div>
+      <h3>${ch.title}</h3>
+      <div class="meta">${total} 道题${done?` · 已答 ${done}/${total}`:''}</div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+      <div class="score-label">${done===total&&total>0?`<span>✓ 已完成</span>`:(done?`进度 ${pct}%`:'点击开始')}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ─────────────────────────────────────────
+// START CHAPTER
+// ─────────────────────────────────────────
+function startChapter(chIdx){
+  state.chIdx=chIdx; state.qIdx=0;
+  const ch=CHAPTERS[chIdx];
+  for(let i=0;i<ch.questions.length;i++){
+    if(!answers[ch.id+'-'+i]){state.qIdx=i;break;}
+  }
+  renderQuestion();
+  showPage('quiz');
+}
+
+// ─────────────────────────────────────────
+// RENDER QUESTION
+// ─────────────────────────────────────────
+function renderQuestion(){
+  const ch=CHAPTERS[state.chIdx];
+  const q=ch.questions[state.qIdx];
+  const total=ch.questions.length;
+  const ki=state.qIdx;
+  const key=ch.id+'-'+ki;
+  const prev=answers[key];
+  state.answered=!!prev;
+
+  document.getElementById('quiz-ch-name').textContent=ch.title;
+  document.getElementById('quiz-counter').textContent=`${ki+1} / ${total}`;
+  document.getElementById('top-prog-fill').style.width=Math.round((ki+1)/total*100)+'%';
+
+  const badge=document.getElementById('type-badge');
+  const typeMap={mc:['单选题','badge-mc'],fill:['填空题','badge-fill'],qa:['简答题','badge-qa'],prog:['程序题','badge-prog']};
+  const [label,cls]=typeMap[q.type]||['题目','badge-mc'];
+  badge.className='type-badge '+cls; badge.textContent=label;
+
+  document.getElementById('q-text').innerHTML=q.q;
+
+  const body=document.getElementById('q-body');
+  body.innerHTML='';
+
+  if(q.type==='mc') renderMC(body,q,prev);
+  else if(q.type==='fill') renderFill(body,q,prev);
+  else renderQA(body,q,prev); // qa and prog
+
+  const fp=document.getElementById('feedback-panel');
+  if(prev && (q.type==='mc'||q.type==='fill')) showFeedback(q,prev);
+  else { fp.className='feedback-panel'; fp.style.display='none'; }
+
+  document.getElementById('btn-prev').disabled=ki===0;
+  document.getElementById('btn-next').textContent=ki===total-1?'查看结果':'下一题 →';
+}
+
+function renderMC(body,q,prev){
+  const wrap=document.createElement('div'); wrap.className='options';
+  const letters=['A','B','C','D'];
+  q.opts.forEach((opt,oi)=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.innerHTML=`<span class="opt-key">${letters[oi]}.</span><span>${opt}</span>`;
+    if(prev){
+      btn.classList.add('disabled');
+      if(oi===q.ans) btn.classList.add('correct');
+      else if(prev.chosen===oi) btn.classList.add('wrong');
+    } else { btn.onclick=()=>submitMC(oi); }
+    wrap.appendChild(btn);
+  });
+  body.appendChild(wrap);
+}
+
+function renderFill(body,q,prev){
+  const wrap=document.createElement('div'); wrap.className='fill-area';
+  const inp=document.createElement('input');
+  inp.type='text'; inp.className='fill-input'; inp.placeholder='请输入答案...'; inp.id='fill-inp';
+  if(prev){ inp.value=prev.chosen; inp.disabled=true; inp.classList.add(prev.correct?'correct':'wrong'); }
+  else { inp.onkeydown=(e)=>{if(e.key==='Enter')submitFill();}; }
+  const sbtn=document.createElement('button'); sbtn.className='submit-btn'; sbtn.textContent='提交'; sbtn.onclick=submitFill;
+  if(prev) sbtn.disabled=true;
+  const rbtn=document.createElement('button'); rbtn.className='reveal-btn'; rbtn.textContent='查看答案'; rbtn.onclick=revealFill;
+  wrap.append(inp,sbtn,rbtn);
+  body.appendChild(wrap);
+}
+
+function renderQA(body,q,prev){
+  const wrap=document.createElement('div'); wrap.className='answer-reveal';
+  const box=document.createElement('div'); box.className='answer-box'; box.id='ans-box';
+  box.innerHTML=q.ans;
+  const btn=document.createElement('button'); btn.className='show-ans-btn'; btn.id='show-ans-btn';
+  if(prev){ box.classList.add('show'); btn.textContent='收起答案'; }
+  else { btn.textContent='查看参考答案 ▼'; }
+  btn.onclick=()=>{
+    const showing=box.classList.toggle('show');
+    btn.textContent=showing?'收起答案 ▲':'查看参考答案 ▼';
+    if(!answers[CHAPTERS[state.chIdx].id+'-'+state.qIdx]){
+      answers[CHAPTERS[state.chIdx].id+'-'+state.qIdx]={chosen:'viewed',correct:true,type:q.type};
+      saveData();
+    }
+  };
+  wrap.append(btn,box);
+  body.appendChild(wrap);
+}
+
+// ─────────────────────────────────────────
+// SUBMIT
+// ─────────────────────────────────────────
+function normalizeAns(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+function checkFill(userRaw,correctArr){
+  const u=normalizeAns(userRaw);
+  return correctArr.some(c=>{ const cn=normalizeAns(c); return u===cn||u.includes(cn)||cn.includes(u); });
+}
+
+function submitMC(chosen){
+  const ch=CHAPTERS[state.chIdx]; const q=ch.questions[state.qIdx];
+  const correct=chosen===q.ans;
+  answers[ch.id+'-'+state.qIdx]={chosen,correct,type:'mc'};
+  saveData(); renderQuestion();
+}
+
+function submitFill(){
+  if(state.answered) return;
+  const ch=CHAPTERS[state.chIdx]; const q=ch.questions[state.qIdx];
+  const val=document.getElementById('fill-inp')?.value||'';
+  const correct=checkFill(val,q.ans);
+  answers[ch.id+'-'+state.qIdx]={chosen:val,correct,type:'fill'};
+  saveData(); renderQuestion();
+}
+
+function revealFill(){
+  const ch=CHAPTERS[state.chIdx]; const q=ch.questions[state.qIdx];
+  if(!answers[ch.id+'-'+state.qIdx]){
+    const val=document.getElementById('fill-inp')?.value||'';
+    answers[ch.id+'-'+state.qIdx]={chosen:val||'[查看答案]',correct:false,type:'fill',revealed:true};
+    saveData();
+  }
+  renderQuestion();
+}
+
+// ─────────────────────────────────────────
+// FEEDBACK
+// ─────────────────────────────────────────
+function showFeedback(q,prev){
+  const fp=document.getElementById('feedback-panel');
+  const ft=document.getElementById('fb-title');
+  const fa=document.getElementById('fb-ans');
+  const fe=document.getElementById('fb-exp');
+  fp.style.display='';
+  if(q.type==='mc'){
+    const letters=['A','B','C','D'];
+    fp.className='feedback-panel show '+(prev.correct?'correct':'wrong');
+    ft.textContent=prev.correct?'✓ 正确！':'✗ 错误';
+    fa.innerHTML=prev.correct?'':`正确答案：<strong>${letters[q.ans]}. ${q.opts[q.ans]}</strong>`;
+    fe.textContent=q.exp;
+  } else {
+    fp.className='feedback-panel show '+(prev.correct?'correct':(prev.revealed?'neutral':'wrong'));
+    ft.textContent=prev.correct?'✓ 正确！':(prev.revealed?'📖 参考答案':'✗ 错误');
+    fa.innerHTML=`参考答案：<strong>${Array.isArray(q.ans)?q.ans[0]:q.ans}</strong>`;
+    fe.textContent=q.exp;
+  }
+}
+
+// ─────────────────────────────────────────
+// NAV
+// ─────────────────────────────────────────
+function prevQ(){ if(state.qIdx>0){state.qIdx--;renderQuestion();} }
+function nextQ(){
+  const ch=CHAPTERS[state.chIdx];
+  if(state.qIdx<ch.questions.length-1){state.qIdx++;renderQuestion();}
+  else showResults();
+}
+
+// ─────────────────────────────────────────
+// RESULTS
+// ─────────────────────────────────────────
+function showResults(){
+  const ch=CHAPTERS[state.chIdx];
+  const total=ch.questions.length;
+  const correct=ch.questions.filter((_,qi)=>{const a=answers[ch.id+'-'+qi];return a&&a.correct;}).length;
+
+  document.getElementById('res-score').textContent=`${correct} / ${total}`;
+  document.getElementById('res-sub').textContent=`${ch.title} · 完成度 ${Math.round(correct/total*100)}%`;
+  document.getElementById('ch-results').innerHTML=`
+    <div class="ch-result-row"><span>${ch.title}</span><span class="ch-score">${correct} / ${total}</span></div>`;
+
+  const wrongs=ch.questions.map((q,qi)=>{const a=answers[ch.id+'-'+qi];return{q,qi,a};}).filter(x=>x.a&&!x.a.correct&&x.q.type==='mc');
+  const ws=document.getElementById('wrong-section');
+  if(wrongs.length){
+    ws.style.display='';
+    document.getElementById('wrong-list').innerHTML=wrongs.map(({q,qi,a})=>{
+      const letters=['A','B','C','D'];
+      return `<div class="wrong-item">
+        <div class="wi-q">Q${qi+1}. ${q.q.replace(/<[^>]+>/g,'').substring(0,60)}...</div>
+        <div class="wi-ans">正确: ${letters[q.ans]}. ${q.opts[q.ans]}</div>
+        ${q.exp?`<div style="font-size:.82rem;color:var(--muted);margin-top:4px">${q.exp}</div>`:''}
+      </div>`;
+    }).join('');
+  } else ws.style.display='none';
+
+  showPage('results');
+}
+
+function redoChapter(){
+  const ch=CHAPTERS[state.chIdx];
+  ch.questions.forEach((_,qi)=>delete answers[ch.id+'-'+qi]);
+  saveData(); state.qIdx=0; renderQuestion(); showPage('quiz');
+}
+
+// ─────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────
+loadData();
+renderHome();
+</script>
+</body>
+</html>
