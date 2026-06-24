@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新思想概论 复习题</title>
+<style>
+:root{--bg:#0d1117;--s1:#161b22;--s2:#21262d;--ac:#ef4444;--ac2:#b91c1c;--green:#3fb950;--red:#f85149;--yellow:#e3b341;--text:#e6edf3;--muted:#8b949e;--border:#30363d;--r:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.page{display:none;min-height:100vh;padding:20px}
+.page.active{display:block}
+.home-header{text-align:center;padding:40px 0 30px}
+.home-header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--ac),#fca5a5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.home-header p{color:var(--muted);font-size:1rem}
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;max-width:1200px;margin:0 auto 30px}
+.ch-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.ch-card:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:0 4px 20px rgba(239,68,68,.15)}
+.ch-card h3{font-size:.95rem;margin-bottom:5px;color:var(--text)}
+.ch-card .meta{font-size:.8rem;color:var(--muted);margin-bottom:10px}
+.ch-card .progress-wrap{background:var(--s2);border-radius:4px;height:5px;margin-bottom:7px}
+.ch-card .progress-bar{background:linear-gradient(90deg,var(--ac),var(--ac2));height:5px;border-radius:4px;transition:width .4s}
+.ch-card .score-label{font-size:.78rem;color:var(--muted)}
+.ch-card .score-label span{color:var(--ac);font-weight:600}
+.ch-num{position:absolute;top:14px;right:14px;font-size:1.6rem;font-weight:700;color:var(--border)}
+.reset-btn{display:block;margin:0 auto 16px;background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 20px;border-radius:6px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.reset-btn:hover{border-color:var(--red);color:var(--red)}
+.nav-links{display:flex;justify-content:center;gap:12px;margin-top:24px;flex-wrap:wrap}
+.nav-link{font-size:.82rem;color:var(--muted);text-decoration:none;padding:5px 14px;border:1px solid var(--border);border-radius:20px;transition:all .2s}
+.nav-link:hover{border-color:var(--ac);color:var(--ac)}
+.quiz-topbar{display:flex;align-items:center;gap:12px;max-width:800px;margin:0 auto 16px;padding:0 4px}
+.back-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.85rem;white-space:nowrap;transition:all .2s}
+.back-btn:hover{border-color:var(--ac);color:var(--text)}
+.topbar-info{flex:1}
+.topbar-info h2{font-size:.95rem;color:var(--text);margin-bottom:3px}
+.topbar-info .prog-text{font-size:.8rem;color:var(--muted)}
+.top-progress-wrap{background:var(--s2);border-radius:4px;height:4px;max-width:800px;margin:0 auto 20px}
+.top-progress-bar{background:linear-gradient(90deg,var(--ac),var(--ac2));height:4px;border-radius:4px;transition:width .3s}
+.q-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:24px;max-width:800px;margin:0 auto 16px}
+.type-badge{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 10px;border-radius:20px;margin-bottom:12px;letter-spacing:.5px}
+.type-badge.mc{background:#ef444420;color:#ef4444}
+.type-badge.tf{background:#8b5cf620;color:#a78bfa}
+.type-badge.qa{background:#10b98120;color:#34d399}
+.q-text{font-size:1rem;line-height:1.7;margin-bottom:18px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt-btn{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:8px;cursor:pointer;text-align:left;font-size:.9rem;line-height:1.5;transition:all .2s}
+.opt-btn:hover:not(:disabled){border-color:var(--ac);background:#ef444410}
+.opt-btn.correct{border-color:var(--green);background:#3fb95020;color:var(--green)}
+.opt-btn.wrong{border-color:var(--red);background:#f8514920;color:var(--red)}
+.opt-btn.show-correct{border-color:var(--green);background:#3fb95010;color:var(--green)}
+.opt-btn:disabled{cursor:not-allowed;opacity:.85}
+.tf-opts{display:flex;gap:12px}
+.tf-btn{flex:1;padding:14px;border-radius:8px;cursor:pointer;font-size:1rem;font-weight:600;border:1px solid var(--border);background:var(--s2);color:var(--text);transition:all .2s}
+.tf-btn:hover:not(:disabled){border-color:var(--ac)}
+.tf-btn.correct{border-color:var(--green);background:#3fb95020;color:var(--green)}
+.tf-btn.wrong{border-color:var(--red);background:#f8514920;color:var(--red)}
+.tf-btn.show-correct{border-color:var(--green);background:#3fb95010;color:var(--green)}
+.tf-btn:disabled{cursor:not-allowed;opacity:.85}
+.exp-panel{margin-top:14px;background:var(--s2);border-radius:8px;padding:14px;border-left:3px solid var(--ac);display:none}
+.exp-panel.show{display:block}
+.exp-panel p,.exp-panel li{font-size:.88rem;line-height:1.7;color:var(--muted)}
+.exp-panel strong,.exp-panel b{color:var(--text)}
+.answer-box{background:var(--s2);border-radius:8px;padding:14px;margin-top:12px;border-left:3px solid #34d399;display:none;font-size:.88rem;line-height:1.8;color:var(--muted)}
+.answer-box.show{display:block}
+.answer-box strong{color:var(--text)}
+.reveal-btn{background:var(--s2);border:1px solid #34d39940;color:#34d399;padding:9px 18px;border-radius:7px;cursor:pointer;font-size:.87rem;margin-top:10px;transition:all .2s}
+.reveal-btn:hover{background:#34d39920;border-color:#34d399}
+.nav-btns{display:flex;gap:10px;max-width:800px;margin:0 auto;justify-content:space-between}
+.nav-btn{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:10px 22px;border-radius:8px;cursor:pointer;font-size:.9rem;transition:all .2s}
+.nav-btn:hover:not(:disabled){border-color:var(--ac)}
+.nav-btn:disabled{opacity:.4;cursor:not-allowed}
+.nav-btn.primary{background:var(--ac);border-color:var(--ac);color:#fff}
+.nav-btn.primary:hover{background:var(--ac2);border-color:var(--ac2)}
+.results-wrap{max-width:700px;margin:0 auto;padding:20px 0}
+.results-wrap h2{font-size:1.6rem;text-align:center;margin-bottom:6px}
+.results-sub{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:30px}
+.score-big{text-align:center;font-size:3.5rem;font-weight:700;color:var(--ac);margin-bottom:6px}
+.ch-result-list{display:flex;flex-direction:column;gap:10px}
+.ch-result-item{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:12px}
+.ch-result-item h4{font-size:.9rem;flex:1}
+.ch-result-item .sc{font-size:.88rem;color:var(--muted)}
+.ch-result-item .sc span{color:var(--ac);font-weight:600}
+.results-actions{display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.results-actions button{padding:10px 22px;border-radius:8px;cursor:pointer;font-size:.9rem;border:1px solid var(--border);background:var(--s2);color:var(--text);transition:all .2s}
+.results-actions button:hover{border-color:var(--ac);color:var(--ac)}
+.tf-result-hint{font-size:.82rem;margin-top:8px;color:var(--muted)}
+.tf-result-hint .correct-ans{color:var(--green);font-weight:600}
+</style>
+</head>
+<body>
+
+<section id="page-home" class="page active">
+  <div class="home-header">
+    <h1>《新思想概论》复习题</h1>
+    <p>2025-2026-2学期 · 共18章 · 单选题 + 判断题 + 论述题</p>
+  </div>
+  <div class="chapter-grid" id="chapterGrid"></div>
+  <div style="text-align:center">
+    <button class="reset-btn" onclick="resetAll()">重置所有答题记录</button>
+  </div>
+  <div class="nav-links">
+    <a href="quiz.html" class="nav-link">← OpenCV 复习题</a>
+    <a href="dl-quiz.html" class="nav-link">← 深度学习 复习题</a>
+    <a href="index.html" class="nav-link">← 返回首页</a>
+  </div>
+</section>
+
+<section id="page-quiz" class="page">
+  <div class="quiz-topbar">
+    <button class="back-btn" onclick="goHome()">← 返回</button>
+    <div class="topbar-info">
+      <h2 id="qChapTitle"></h2>
+      <div class="prog-text" id="qProgText"></div>
+    </div>
+  </div>
+  <div class="top-progress-wrap"><div class="top-progress-bar" id="topBar"></div></div>
+  <div class="q-card" id="qCard"></div>
+  <div class="nav-btns">
+    <button class="nav-btn" id="prevBtn" onclick="prevQ()">← 上一题</button>
+    <button class="nav-btn primary" id="nextBtn" onclick="nextQ()" disabled>下一题 →</button>
+  </div>
+</section>
+
+<section id="page-results" class="page">
+  <div class="results-wrap">
+    <h2>本章答题完成</h2>
+    <p class="results-sub" id="resChapName"></p>
+    <div class="score-big" id="resBig"></div>
+    <p style="text-align:center;color:var(--muted);margin-bottom:24px" id="resDetail"></p>
+    <div class="results-actions">
+      <button onclick="retryChap()">重新作答本章</button>
+      <button onclick="goHome()">返回章节选择</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const CHAPTERS = [
+{id:'intro',title:'导论',sub:'习近平新时代中国特色社会主义思想概论',
+ mc:[
+  {q:'党的二十大提出的"六个必须坚持"是习近平新时代中国特色社会主义思想的世界观、方法论和贯穿其中的立场观点方法的重要体现。下列哪一项不属于"六个必须坚持"的内容？',o:['必须坚持人民至上','必须坚持自信自立','必须坚持问题导向','必须坚持改革开放'],a:3},
+  {q:'党的十九大、十九届六中全会提出的哪些内容概括了习近平新时代中国特色社会主义思想的主要内容？',o:['"十个明确""十四个坚持""十三个方面成就"','"八个明确""十四个坚持""十二个方面成就"','"十个明确""十二个坚持""十三个方面成就"','"八个明确""十四个坚持""十三个方面成就"'],a:0},
+  {q:'坚持和发展中国特色社会主义，总任务是（ ）',o:['完善和发展中国特色社会主义制度、推进国家治理体系和治理能力现代化','建设中国特色社会主义法治体系、建设社会主义法治国家','实现社会主义现代化和中华民族伟大复兴，在全面建成小康社会的基础上，分两步走在本世纪中叶建成富强民主文明和谐美丽的社会主义现代化强国，以中国式现代化推进中华民族伟大复兴','建设一支听党指挥、能打胜仗、作风优良的人民军队，把人民军队建设成为世界一流军队'],a:2},
+  {q:'经过不懈努力，中国共产党找到了跳出治乱兴衰历史周期率的第二个答案，确保党永远不变质、不变色、不变味。这个"第二个答案"指的是（ ）',o:['全面依法治国','群众路线','自我革命','民主集中制'],a:2}
+ ],
+ tf:[
+  {q:'习近平新时代中国特色社会主义思想是当代中国马克思主义、二十一世纪马克思主义，是中华文化和中国精神的时代精华，实现了马克思主义中国化时代化新的飞跃。',a:true},
+  {q:'"两个确立"是指确立习近平同志党中央的核心、全党的核心地位，确立习近平新时代中国特色社会主义思想的指导地位。',a:true},
+  {q:'习近平新时代中国特色社会主义思想是马克思主义在当代中国发展的最新理论成果，科学回答了新时代坚持和发展什么样的中国特色社会主义、怎样坚持和发展中国特色社会主义等重大时代课题。',a:true},
+  {q:'习近平新时代中国特色社会主义思想，正是在中华民族迎来从站起来、富起来到强起来的伟大飞跃，实现中华民族伟大复兴进入不可逆转的历史进程中创立并不断丰富发展的。',a:true},
+  {q:'"两个结合"是指马克思主义基本原理同中国具体实际相结合、同中国式现代化相结合。',a:false,exp:'正确表述：马克思主义基本原理同中国具体实际相结合、同中华优秀传统文化相结合。'}
+ ],
+ qa:[
+  {q:'试论述习近平新时代中国特色社会主义思想回答了什么重大时代课题？（导论）',a:'<p>1. 新时代坚持和发展什么样的中国特色社会主义、怎样坚持和发展中国特色社会主义；</p><p>2. 建设什么样的社会主义现代化强国、怎样建设社会主义现代化强国；</p><p>3. 建设什么样的长期执政的马克思主义政党、怎样建设长期执政的马克思主义政党。</p>'}
+ ]
+},
+{id:'ch1',title:'第一章',sub:'中国特色社会主义进入新时代',
+ mc:[
+  {q:'党的十九大作出的重大政治论断是（ ）',o:['中国特色社会主义进入新时代','中国特色社会主义进入新阶段','中国特色社会主义进入新纪元','中国特色社会主义进入新发展'],a:0},
+  {q:'经过长期努力，中国特色社会主义进入新时代，这是我国发展新的（ ）',o:['历史地位','历史时期','历史阶段','历史方位'],a:3},
+  {q:'中国特色社会主义"四个自信"是指（ ）',o:['道路自信、理论自信、制度自信、文化自信','道路自信、理论自信、法治自信、民族自信','理论自信、制度自信、文化自信、发展自信','制度自信、文化自信、改革自信、人民自信'],a:0},
+  {q:'中国特色社会主义事业"五位一体"总体布局是指统筹推进（ ）',o:['经济建设、政治建设、文化建设、社会建设、生态文明建设','经济建设、政治建设、文化建设、社会建设、党的建设','经济建设、政治建设、文化建设、法治建设、生态文明建设','经济建设、政治建设、教育建设、社会建设、生态文明建设'],a:0},
+  {q:'下列选项中，哪一项不属于当前"四个全面"战略布局的内容？',o:['全面深化改革','全面依法治国','全面扩大开放','全面从严治党'],a:2},
+  {q:'习近平总书记在十九大报告中指出，中国特色社会主义进入新时代，我国社会主要矛盾（ ）',o:['已经转化为人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾','仍然是无产阶级同资产阶级之间的矛盾','官僚资本同民族资本之间的矛盾','是人民日益增长的物质文化需要同落后的社会生产之间的矛盾'],a:0},
+  {q:'中国共产党为什么能，中国特色社会主义为什么好，归根到底是（ ）',o:['马克思主义行，是中国化时代化的马克思主义行','中国共产党能','中国特色社会主义好','靠坚持四项基本原则，不犯错误'],a:0},
+  {q:'坚定制度自信，就是坚信（ ）是当代中国发展进步的根本制度保障，是具有明显制度优势、强大自我完善能力的先进制度',o:['中国特色社会主义制度','中国特色社会主义经济制度','中国特色社会主义理论体系','中国特色社会主义道路'],a:0}
+ ],
+ tf:[
+  {q:'坚定道路自信，就是坚信中国特色社会主义道路是我国实现社会主义现代化、创造人民美好生活的必由之路，是实现中华民族伟大复兴的必由之路。',a:true},
+  {q:'坚定理论自信，就是坚信中国特色社会主义理论体系是指导党和人民实现中华民族伟大复兴的正确理论，是立足时代前沿、与时俱进的科学理论。',a:true},
+  {q:'随着我国社会主要矛盾发生变化，我国已跨越社会主义初级阶段，不再是发展中国家。',a:false,exp:'我国仍处于并将长期处于社会主义初级阶段，仍是发展中国家。'},
+  {q:'对改革开放前的历史时期要正确评价，不能用改革开放后的历史时期否定改革开放前的历史时期，也不能用改革开放前的历史时期否定改革开放后的历史时期。',a:true},
+  {q:'中国特色社会主义进入新时代，是我国社会主要矛盾发生新变化的反映。',a:true},
+  {q:'"四个伟大"指的是伟大斗争，伟大工程，伟大事业，伟大征程。',a:false,exp:'正确表述：四个伟大 = 伟大斗争、伟大工程、伟大事业、伟大梦想（不是"伟大征程"）。'}
+ ],
+ qa:[
+  {q:'试论述党在社会主义初级阶段的基本路线。（第一章）',a:'<p>领导和团结全国各族人民，以经济建设为中心，坚持四项基本原则，坚持改革开放，自力更生，艰苦创业，为把我国建设成为富强民主文明和谐美丽的社会主义现代化强国而奋斗。</p>'},
+  {q:'进入新时代意味着什么？（第一章）',a:'<p>1. 意味着中华民族迎来了从站起来、富起来到强起来的伟大飞跃；</p><p>2. 意味着科学社会主义在二十一世纪的中国焕发出强大生机活力；</p><p>3. 意味着拓展了发展中国家走向现代化的途径，为解决人类问题贡献了中国智慧和中国方案。</p>'}
+ ]
+},
+{id:'ch2',title:'第二章',sub:'中国式现代化与中华民族伟大复兴',
+ mc:[
+  {q:'一百年来，中国共产党团结带领中国人民进行的一切奋斗、一切牺牲、一切创造，归结起来就是一个主题（ ）',o:['建立新中国','追求共同富裕','实现中华民族伟大复兴','实现人民对美好生活的向往'],a:2},
+  {q:'下列选项中，不属于中国梦本质内容的是（ ）',o:['国家富强','民族振兴','人民幸福','全球领导'],a:3},
+  {q:'实现中国梦必须走中国道路，这就是（ ）',o:['中华民族大团结之路','社会发展之路','人民民主专政之路','中国特色社会主义道路'],a:3},
+  {q:'党的二十大进一步明确，全面建成社会主义现代化强国总的战略安排是分两步走。以下哪一项正确描述了这一战略安排？',o:['从2020年到2035年基本实现社会主义现代化；从2035年到本世纪中叶把我国建成富强民主文明和谐美丽的社会主义现代化强国','从2020年到2040年基本实现社会主义现代化；从2040年到本世纪中叶建成社会主义现代化强国','从2020年到2045年基本实现社会主义现代化；从2045年到本世纪中叶建成社会主义现代化强国','从2020年到2050年基本实现社会主义现代化；从2050年到本世纪中叶建成社会主义现代化强国'],a:0},
+  {q:'中国共产党的初心和使命是（ ）',o:['实现共同富裕，建设社会主义现代化强国','坚持四项基本原则，坚持改革开放','为中国人民谋幸福、为中华民族谋复兴','统筹推进"五位一体"总体布局，协调推进"四个全面"战略布局'],a:2},
+  {q:'下列选项中，不属于推进中国式现代化需要牢牢把握的重大原则的是（ ）',o:['坚持和加强党的全面领导','坚持全面从严治党','坚持以人民为中心的发展思想','坚持发扬斗争精神'],a:1},
+  {q:'下列选项中，不属于推进中国式现代化需要正确处理的重大关系的是（ ）',o:['正确处理顶层设计与实践探索的关系','正确处理守正与创新的关系','正确处理活力与秩序的关系','正确处理发展与安全的关系'],a:3}
+ ],
+ tf:[
+  {q:'实现中华民族伟大复兴，是近代以来中国人民的共同梦想，是中国共产党矢志不渝的奋斗目标。',a:true},
+  {q:'第一个百年奋斗目标是指到本世纪中叶建成富强民主文明和谐美丽的社会主义现代化国家，实现中华民族伟大复兴。',a:false,exp:'第一个百年目标 = 到建党100年时全面建成小康社会（已于2021年实现）；第二个百年目标才是本世纪中叶建成社会主义现代化强国。'},
+  {q:'新中国成立七十多年来，我们党领导人民创造了世所罕见的经济快速发展奇迹和科技自立自强奇迹。',a:false,exp:'正确表述：经济快速发展奇迹和社会长期稳定奇迹（两大奇迹）。'},
+  {q:'中国式现代化为广大发展中国家独立自主迈向现代化、探索现代化道路的多样性提供了全新选择。',a:true},
+  {q:'党的十九大提出，到2020年各方面制度更加完善，国家治理体系和治理能力现代化基本实现。',a:false,exp:'2035年基本实现国家治理体系和治理能力现代化。'}
+ ],
+ qa:[
+  {q:'论述中国式现代化的中国特色。（第二章）',a:'<p>1. 中国式现代化是人口规模巨大的现代化；</p><p>2. 中国式现代化是全体人民共同富裕的现代化；</p><p>3. 中国式现代化是物质文明和精神文明相协调的现代化；</p><p>4. 中国式现代化是人与自然和谐共生的现代化；</p><p>5. 中国式现代化是走和平发展道路的现代化。</p>'},
+  {q:'试论述中国式现代化的本质要求。（第二章）',a:'<p>坚持中国共产党领导，坚持中国特色社会主义，实现高质量发展，发展全过程人民民主，丰富人民精神世界，实现全体人民共同富裕，促进人与自然和谐共生，推动构建人类命运共同体，创造人类文明新形态。</p>'}
+ ]
+},
+{id:'ch3',title:'第三章',sub:'坚持和加强党的全面领导',
+ mc:[
+  {q:'中国特色社会主义最本质的特征是（ ）',o:['人民共同富裕','人民当家作主','中国共产党领导','社会主义现代化'],a:2},
+  {q:'习近平指出："一定要认清，中国最大的国情就是（ ）。什么是中国特色？这就是中国特色。"',o:['以经济建设为中心','中国共产党的领导','坚持人民代表大会制度','推进全面依法治国'],a:1},
+  {q:'《中国共产党党章》明确规定，中国共产党是中国工人阶级的先锋队，同时是（ ）',o:['中国人民的先锋队','中华民族的先锋队','中国人民和中华民族的先锋队','中国新阶层的先锋队'],a:2},
+  {q:'维护党中央权威和集中统一领导，最关键的是（ ）',o:['坚决维护习近平同志党中央的核心、全党的核心地位','实行民主集中制','修改党章，加强党中央权力','严明政治纪律'],a:0},
+  {q:'下列选项中，不属于"四个意识"内容的是（ ）',o:['政治意识','大局意识','创新意识','看齐意识'],a:2},
+  {q:'中国特色社会主义制度的最大优势是（ ）',o:['中国共产党领导','全心全意为人民服务','人民共同富裕','社会主义现代化'],a:0},
+  {q:'中国共产党的性质决定了党的宗旨是（ ）',o:['立党为公、执政为民','以人为本、执政为民','全心全意为人民服务','为实现共产主义而奋斗'],a:2},
+  {q:'党是最高政治领导力量，其领导作用体现在多个方面。下列说法中错误的是（ ）',o:['引领政治方向','统领政治体系','领导社会治理','代替国家机关对所有事务作出具体决策和执行'],a:3},
+  {q:'下列关于"党的领导是全面的"体现的说法中，错误的是（ ）',o:['领导对象要全面覆盖','领导内容要全面','领导部门要全面','领导方法要全面'],a:2}
+ ],
+ tf:[
+  {q:'党的领导是全面的，所以，党组织包揽包办一切事情。',a:false,exp:'党的领导是全面的，但党不是包办代替，而是发挥政治领导、思想引领、组织协调的作用。'},
+  {q:'中国共产党作为最高政治领导力量是由我国国家性质和政治制度体系决定的。',a:true},
+  {q:'党的领导是全面的、系统的、整体的，必须贯穿到治国理政的方方面面。',a:true},
+  {q:'"两个维护"是指坚决维护习近平总书记党中央的核心、全党的核心地位，坚决维护党中央权威和集中统一领导。',a:true},
+  {q:'坚持党的全面领导与过去党的一元化领导是等同的。',a:false,exp:'二者有本质区别：党的全面领导强调政治领导和政策方向，并非过去的包办代替式的一元化领导。'},
+  {q:'维护党中央权威和集中统一领导同坚持民主集中制是相矛盾的。',a:false,exp:'二者是统一的，维护党中央权威恰恰是民主集中制的体现和要求。'},
+  {q:'党中央集中统一领导是党的领导的最高原则。',a:true}
+ ],
+ qa:[
+  {q:'试论述党的领导制度主要涵盖哪几个方面的制度。（第三章）',a:'<p>1. 建立不忘初心、牢记使命的制度；</p><p>2. 完善坚定维护党中央权威和集中统一领导的各项制度；</p><p>3. 健全党的全面领导制度；</p><p>4. 健全为人民执政、靠人民执政各项制度；</p><p>5. 健全提高党的执政能力和领导水平制度；</p><p>6. 完善全面从严治党制度。</p>'}
+ ]
+},
+{id:'ch4',title:'第四章',sub:'坚持以人民为中心',
+ mc:[
+  {q:'（ ）是中国共产党的根本政治立场，是马克思主义政党区别于其他政党的显著标志',o:['人民地位','人民立场','群众路线','实事求是'],a:1},
+  {q:'我们党的最大政治优势是密切联系群众，党执政后的最大危险是（ ）',o:['消极腐败','改革出问题','没有坚持公有制的主体地位','脱离群众'],a:3},
+  {q:'（ ）是新时代坚持和发展中国特色社会主义的根本立场，是贯穿党治国理政全部活动的一条红线',o:['把马克思主义基本原理与中国实际相结合','坚持以人民为中心','坚持和发展中国特色社会主义','"五位一体"总体布局'],a:1},
+  {q:'我们党的最大政治优势是（ ）',o:['党领导一切','走中国特色社会主义道路','人多力量大','密切联系群众'],a:3},
+  {q:'（ ）是党的工作的最高裁决者和最终评判者',o:['实践','人民','国务院','党中央'],a:1},
+  {q:'（ ）始终是党的生命线和根本工作路线，是我们党永葆青春活力和战斗力的重要传家宝',o:['群众路线','经济路线','人民立场','政治立场'],a:0},
+  {q:'（ ）是社会主义的本质要求，是中国式现代化的重要特征',o:['共同富裕','社会和谐','人民主体地位','解决社会主要矛盾'],a:0}
+ ],
+ tf:[
+  {q:'人民是历史的创造者，是决定党和国家前途命运的根本力量。',a:true},
+  {q:'中国共产党根基在人民、血脉在人民、力量在人民。人民是我们党的生命之根、执政之基、力量之源。',a:true},
+  {q:'为民造福是立党为公、执政为民的本质要求。',a:true},
+  {q:'在中国共产党领导的社会主义中国，党性和人民性是不一致的、不统一的。',a:false,exp:'党性和人民性是一致的、统一的，党的利益与人民利益根本一致。'},
+  {q:'人民对美好生活的向往就是党的奋斗目标。',a:true},
+  {q:'共同富裕是全体人民共同富裕，是人民群众物质生活和精神生活都富裕，是所有人都同时富裕，是所有地区同时达到一个富裕水准，是整齐划一的平均主义。',a:false,exp:'共同富裕不是同步富裕，不是平均主义，允许先富带动后富，是一个长期奋斗过程。'},
+  {q:'要始终把人民放在心中最高位置，树立正确的政绩观，以人民满意不满意作为检验工作的最终评判标准。',a:true},
+  {q:'共同富裕是一个可以短期内迅速实现的目标，不需要长期努力和渐进过程。',a:false,exp:'共同富裕是一个长期奋斗的过程，不可能一蹴而就，需要持续努力。'},
+  {q:'促进人的全面发展与促进共同富裕在本质上是相互冲突的，难以统一。',a:false,exp:'二者在本质上是统一的，共同富裕既包括物质富裕，也包括人的全面发展。'}
+ ],
+ qa:[
+  {q:'试论述如何坚持人民立场。（第四章）',a:'<p>1. 坚持人民立场，就要坚持以人民为中心的执政理念，将其贯穿于党和国家事业发展各方面；</p><p>2. 坚持人民立场，就要始终牢记党的初心和使命；</p><p>3. 坚持人民立场，就要始终保持党同人民群众的血肉联系；</p><p>4. 坚持人民立场，就要热爱人民、尊重人民、敬畏人民。</p>'}
+ ]
+},
+{id:'ch5',title:'第五章',sub:'全面深化改革',
+ mc:[
+  {q:'全面深化改革的总目标是（ ）',o:['推进国家治理体系和治理能力现代化','完善和发展中国特色社会主义制度，推进国家治理体系和治理能力现代化','进一步解放思想、发展社会生产力','赋予社会主义新的生机活力，推进国家治理体系和治理能力现代化'],a:1},
+  {q:'（ ）对全面深化改革进行了顶层设计、系统规划和总体部署，明确了全面深化改革的总目标和主要任务',o:['党的十八大','党的十八届三中全会','党的十九大','党的十九届六中全会'],a:1},
+  {q:'下列哪一项，不属于全面深化改革开放要坚持的正确方法论（ ）',o:['加强顶层设计和摸着石头过河相结合','统筹改革发展稳定','胆子要大，步子要稳','坚持依法治国与以德治国相结合'],a:3}
+ ],
+ tf:[
+  {q:'高质量发展是决定当代中国命运的关键一招，也是决定实现"两个一百年"奋斗目标、实现中华民族伟大复兴的关键一招。',a:false,exp:'全面深化改革才是"关键一招"。高质量发展是经济工作的主题主线。'},
+  {q:'推进国家治理体系和治理能力现代化，必须把中国特色社会主义制度优势转化为治理效能。',a:true},
+  {q:'改革发展稳定是现代化建设的三个重要支点，全面深化改革必须坚持三者的有机统一。',a:true},
+  {q:'改革和法治如鸟之两翼、车之两轮、相辅相成。',a:true},
+  {q:'面对百年未有之大变局，中国可能会根据国际形势变化关闭对外开放的大门。',a:false,exp:'中国对外开放的大门只会越开越大，不会关闭。'},
+  {q:'中国对外开放本质上是中国一家唱独角戏，其他国家只需配合执行。',a:false,exp:'对外开放是互利共赢的，是双向的，不是单方面的。'}
+ ],
+ qa:[
+  {q:'试论述如何推进国家治理体系和治理能力现代化。（第五章）',a:'<p>1. 必须坚定中国特色社会主义制度自信；</p><p>2. 必须更好发挥中国特色社会主义制度优势；</p><p>3. 必须把中国特色社会主义制度优势转化为国家治理效能。</p>'}
+ ]
+},
+{id:'ch6',title:'第六章',sub:'新发展阶段·新发展理念·新发展格局',
+ mc:[
+  {q:'党的十八大以来，我国经济已由高速增长阶段转向（ ）阶段',o:['世界级市场','高水平开放','强动力转换','高质量发展'],a:3},
+  {q:'我们乘势而上开启全面建设社会主义现代化国家新征程、向第二个百年奋斗目标进军，这标志着我国进入了一个（ ）',o:['新发展时期','新发展方位','新发展阶段','新发展格局'],a:2},
+  {q:'习近平指出，新时代抓发展，必须更加突出发展理念，坚定不移贯彻（ ）的新发展理念',o:['改革、和谐、绿色、开放、共享','创新、协调、和谐、开放、共赢','创新、和谐、绿色、开放、发展','创新、协调、绿色、开放、共享'],a:3},
+  {q:'我国公有制经济不包括（ ）',o:['国有经济','集体经济','混合所有制经济中的国有成分和集体成分','外资企业'],a:3},
+  {q:'我国非公有制经济不包括（ ）',o:['个体经济','私营经济','港澳台投资经济','集体经济'],a:3},
+  {q:'我国社会主义基本经济制度不包括（ ）',o:['公有制为主体、多种所有制经济共同发展','按劳分配为主体、多种分配方式并存','社会主义市场经济体制','人民代表大会制度'],a:3},
+  {q:'构建高水平社会主义市场经济体制，关键是要（ ）',o:['处理好政府和市场的关系','处理好当前利益和长远利益的关系','处理好中国和外国的关系','处理好效率和公平的关系'],a:0},
+  {q:'新发展格局是指以（ ）为主体、国内国际双循环相互促进',o:['市场大循环','经济大循环','国际大循环','国内大循环'],a:3}
+ ],
+ tf:[
+  {q:'科技是党执政兴国的第一要务。',a:false,exp:'发展才是党执政兴国的第一要务；创新是发展的第一动力；科技是第一生产力。'},
+  {q:'资本是引领发展的第一动力。',a:false,exp:'创新是引领发展的第一动力。'},
+  {q:'今天我们所处的新发展阶段，就是社会主义初级阶段中的一个阶段，同时是其中经过几十年积累、站到了新的起点上的一个阶段。',a:true},
+  {q:'贯彻新发展理念是新时代我国发展壮大的必由之路。',a:true},
+  {q:'"两个毫不动摇"是指毫不动摇巩固和发展公有制经济，毫不动摇鼓励、支持、引导非公有制经济发展。',a:true},
+  {q:'从我国生产力与生产关系的实际出发，我们确立了按劳分配为主体、多种分配方式并存的分配制度，形成了我国的基本分配制度。',a:true}
+ ],
+ qa:[
+  {q:'试论述我国进入新发展阶段的基本依据？（第六章）',a:'<p>1. <strong>理论依据：</strong>马克思主义是远大理想和现实目标相结合、历史必然性和发展阶段性相统一的统一论者，坚信人类社会必然走向共产主义，但实现这一崇高目标必然经历若干历史阶段。</p><p>2. <strong>历史依据：</strong>新发展阶段是我们党带领人民迎来从站起来、富起来到强起来历史性跨越的新阶段。</p><p>3. <strong>现实依据：</strong>我们已经拥有开启新征程、实现新的更高目标的雄厚物质基础。</p>'},
+  {q:'试论述推动高质量发展的重大战略意义。（第六章）',a:'<p>1. 高质量发展为全面建设社会主义现代化国家提供更为坚实的物质基础；</p><p>2. 高质量发展是不断满足人民对美好生活需要的重要保证；</p><p>3. 高质量发展是维护国家长治久安的必然要求。</p>'}
+ ]
+},
+{id:'ch7',title:'第七章',sub:'科教兴国战略',
+ mc:[
+  {q:'下列哪一项不属于落实立德树人根本任务必须着力解决好的根本问题（ ）',o:['培养什么人','怎样培养人','为谁培养人','靠什么培养人'],a:3},
+  {q:'（ ）是国家强盛之基、安全之要',o:['科技自立自强','人才引进','共同富裕','改革开放'],a:0},
+  {q:'必须坚持教育优先发展，把（ ）作为教育的根本任务，办好人民满意的教育',o:['立德树人','社会实践','创新拔尖','专业技术'],a:0},
+  {q:'（ ）是科技创新的源头。我国面临的很多"卡脖子"技术问题，根子是基础理论研究跟不上',o:['应用研究','国家实验室','经济特区','基础研究'],a:3},
+  {q:'创新驱动发展战略，就是要坚持（ ）是第一动力',o:['科技','人才','创新','党的领导'],a:2}
+ ],
+ tf:[
+  {q:'实现高水平科技自立自强是国家强盛和民族复兴的战略基石。',a:true},
+  {q:'科教兴国战略，就是要全面落实人才是第一生产力的思想。',a:false,exp:'科教兴国战略的核心是"科学技术是第一生产力"，人才是第一资源。'},
+  {q:'人才强国战略，就是要牢固树立自然资源是第一资源的理念。',a:false,exp:'人才强国战略要树立"人才是第一资源"的理念。'},
+  {q:'经过长期努力，我国已建成世界上规模最大的教育体系。',a:true},
+  {q:'推进教育现代化的总体目标是：到2020年，全面实现"十三五"发展目标；到2035年，总体实现教育现代化，迈入教育强国行列。',a:true},
+  {q:'坚持党对人才工作的全面领导是做好人才工作的根本保证。',a:true}
+ ],
+ qa:[
+  {q:'试论述教育、科技、人才的多重系统集成功能有哪些。（第七章）',a:'<p>1. 动力塑造功能；</p><p>2. 价值凝聚功能；</p><p>3. 人的发展功能；</p><p>4. 安全保障功能；</p><p>5. 文明协调功能。</p>'}
+ ]
+},
+{id:'ch8',title:'第八章',sub:'发展全过程人民民主',
+ mc:[
+  {q:'我国是工人阶级领导的、以工农联盟为基础的（ ）的社会主义国家，国家一切权力属于人民',o:['人民民主专政','人民当家作主','中国共产党领导','民主专政'],a:0},
+  {q:'（ ）是社会主义民主政治的本质属性',o:['人民民主专政','人民当家作主','中国共产党领导','全过程人民民主'],a:3},
+  {q:'下列哪一项不是全过程人民民主展现出的鲜明特征（ ）',o:['过程民主和成果民主相统一','程序民主和实质民主相统一','直接民主和间接民主相统一','国外民主和国内民主相统一'],a:3},
+  {q:'（ ）是中国共产党夺取革命、建设、改革事业胜利的重要法宝，也是实现中华民族伟大复兴的重要法宝',o:['协商民主','统一战线','全过程人民民主','实现中华民族伟大复兴'],a:1},
+  {q:'全过程人民民主是全链条的民主，体现在哪些环节？',o:['民主选举、民主协商、民主决策、民主管理、民主监督','民主选举、民主协商、民主决策、民主评议、民主监督','民主选举、民主协商、民主决策、民主执行、民主评估','民主选举、民主协商、民主决策、民主管理、民主问责'],a:0},
+  {q:'历史和实践证明，（ ）是社会主义的生命，没有民主就没有社会主义，就没有社会主义的现代化，就没有中华民族伟大复兴',o:['人民民主','人民当家作主','以人民为中心','坚持人民的主体地位'],a:0}
+ ],
+ tf:[
+  {q:'全过程人民民主是全链条、全方位、全覆盖的民主。',a:true},
+  {q:'全过程人民民主是最广泛、最真实、最管用的民主。',a:true},
+  {q:'一个国家是不是民主，应该由这个国家的执政党来评判，而不应该由外部少数人指手画脚来评判。',a:false,exp:'一个国家是不是民主，应该由这个国家的人民来评判，而不应该由外部少数人指手画脚来评判。'},
+  {q:'人民当家作主是发展全过程人民民主的根本出发点和归宿。',a:true},
+  {q:'人民代表大会制度是我国的基本政治制度。',a:false,exp:'人民代表大会制度是我国的根本政治制度，不是基本政治制度。'},
+  {q:'坚定不移走中国特色社会主义政治发展道路，必须坚持党的领导、人民当家作主、依法治国有机统一。',a:true},
+  {q:'面对发展，我国可以适当照抄照搬他国的政治制度。',a:false,exp:'政治制度不能照抄照搬，必须走适合自己国情的政治发展道路。'}
+ ],
+ qa:[
+  {q:'试论述如何走中国特色社会主义政治发展道路。（第八章）',a:'<p>1. 必须坚持党的领导、人民当家作主、依法治国有机统一；</p><p>2. 必须积极稳妥推进政治体制改革；</p><p>3. 必须始终保持政治定力。</p>'}
+ ]
+},
+{id:'ch9',title:'第九章',sub:'全面依法治国',
+ mc:[
+  {q:'（ ）是中国特色社会主义法治体系的根本制度基础，是全面推进依法治国的根本制度保障',o:['中国特色社会主义制度','党的领导','马克思主义指导','以德治国'],a:0},
+  {q:'以下哪一项，不属于中国特色社会主义法治道路的核心要义（ ）',o:['坚持党的领导','坚持中国特色社会主义制度','贯彻中国特色社会主义法治理论','坚持法治中国建设'],a:3},
+  {q:'以下哪一项，不属于坚持和拓展中国特色社会主义法治道路必须毫不动摇坚持的原则（ ）',o:['坚持中国共产党的领导','坚持改革发展稳定','坚持法律面前人人平等','坚持依法治国和以德治国相结合'],a:1},
+  {q:'以下哪一项，不属于全面依法治国必须正确处理的关系（ ）',o:['改革和法治的关系','发展与安全的关系','依法治国和以德治国的关系','依法治国和依规治党的关系'],a:1},
+  {q:'全面依法治国的总目标是（ ）',o:['建设中国特色社会主义法治体系','建设中国特色社会主义法治体系，建设社会主义法治国家','建设社会主义法治国家','有法可依、有法必依、违法必究、执法必严'],a:1},
+  {q:'以下哪一项，不属于中国特色社会主义法治理论的内容（ ）',o:['社会主义法治精神','社会主义法治文化','社会主义法治政党','社会主义法学理论体系'],a:2}
+ ],
+ tf:[
+  {q:'全面深化改革是中国特色社会主义最本质的特征，是社会主义法治最根本的保证。',a:false,exp:'党的领导是中国特色社会主义最本质的特征，也是社会主义法治最根本的保证。'},
+  {q:'人类社会发展的事实证明，依法治理是最可靠、最稳定的治理。',a:true},
+  {q:'宪法是国家的根本法，是治国安邦的总章程，是党和人民意志的集中体现，是国家各种制度和法律法规的总依据。',a:true},
+  {q:'全面依法治国的唯一正确道路是中国特色社会主义政治发展道路。',a:false,exp:'全面依法治国的唯一正确道路是中国特色社会主义法治道路。'},
+  {q:'全面依法治国的总抓手是建设社会主义法治国家。',a:false,exp:'全面依法治国的总抓手是建设中国特色社会主义法治体系。'},
+  {q:'习近平法治思想的创立深刻回答了新时代为什么实行全面依法治国、怎样实行全面依法治国等一系列重大问题。',a:true},
+  {q:'中国特色社会主义法治道路的核心要义，就是要坚持党的领导，坚持中国特色社会主义制度，贯彻中国特色社会主义法治理论。',a:true}
+ ],
+ qa:[
+  {q:'试论述如何建设和完善中国特色社会主义法治体系。（第九章）',a:'<p>1. 加快形成完备的法律规范体系；</p><p>2. 加快形成高效的法治实施体系；</p><p>3. 加快形成严密的法治监督体系；</p><p>4. 加快形成有力的法治保障体系；</p><p>5. 加快形成完善的党内法规体系。</p>'}
+ ]
+},
+{id:'ch10',title:'第十章',sub:'社会主义文化强国',
+ mc:[
+  {q:'建设社会主义文化强国、推动社会主义文化繁荣兴盛，关键在于（ ）',o:['坚定中国特色社会主义文化自信','高质量发展','提高综合国力','贯彻新发展理念'],a:0},
+  {q:'下列哪一项，不属于中华文明的突出特性（ ）',o:['连续性','民族性','包容性','和平性'],a:1},
+  {q:'下列哪一项，不属于社会主义核心价值观回答的重大问题？',o:['建设什么样的国家','建设什么样的社会','培育什么样的公民','培育什么样的人才'],a:3},
+  {q:'下列选项中，不属于社会主义核心价值观的内涵的是（ ）',o:['富强、民主、文明、和谐','自由、平等、公正、法治','廉洁、奉献、公开、美丽','爱国、敬业、诚信、友善'],a:2},
+  {q:'（ ）是中华文明的智慧结晶和精华所在，是中华民族的根和魂',o:['中华优秀传统文化','社会主义先进文化','革命文化','中国特色社会主义文化'],a:0},
+  {q:'坚持中国特色社会主义文化发展道路，必须坚持"二为"方向。"二为"方向具体是指（ ）',o:['为人民服务、为社会主义服务','为人民服务、为中华民族服务','为经济建设服务、为政治建设服务','为党的事业服务、为国家发展服务'],a:0},
+  {q:'下列精神中，不属于中国特色社会主义新时代时期形成的中国共产党人精神谱系的是（ ）',o:['脱贫攻坚精神','伟大抗疫精神','"两弹一星"精神','探月精神'],a:2}
+ ],
+ tf:[
+  {q:'坚持中国特色社会主义文化建设的"双百"方针是指坚持百花齐放、百家争鸣。',a:true},
+  {q:'互联网是意识形态工作的主阵地、主战场、最前沿。',a:true},
+  {q:'共同富裕仅指全体人民在物质生活上的富裕，不包括精神生活的富裕。',a:false,exp:'共同富裕是物质生活和精神生活都富裕。'},
+  {q:'文化自信是一个国家、一个民族发展中最基本、最深沉、最持久的力量。',a:true}
+ ],
+ qa:[
+  {q:'试论述中国故事最精彩的主题是什么？（第十章）',a:'<p>中国共产党为什么能；马克思主义为什么行；中国特色社会主义为什么好。</p>'}
+ ]
+},
+{id:'ch11',title:'第十一章',sub:'增进民生福祉',
+ mc:[
+  {q:'（ ）是坚持立党为公、执政为民的本质要求',o:['增进民生福祉','建立强大的国防','全面依法治国','思想政治教育'],a:0},
+  {q:'基层治理是国家治理的基石，（ ）是社会治理最基本的单元，是党和政府联系、服务居民群众的"最后一公里"',o:['乡村人民政府','居委会','基层党支部','城乡社区'],a:3},
+  {q:'坚持以人民为中心的发展思想，在高质量发展中促进共同富裕，正确处理（ ）的关系，构建初次分配、再分配、三次分配协调配套的基础性制度安排',o:['效率和公平','收入和分配','经济和社会','政府和市场'],a:0},
+  {q:'（ ）是最大的民生工程、民心工程、根基工程，是社会稳定的重要保障',o:['生产','共同富裕','就业','生活水平'],a:2}
+ ],
+ tf:[
+  {q:'让人民生活幸福是"国之大者"。',a:true},
+  {q:'发展是解决民生问题的"总钥匙"，民生是发展的"指南针"。要在发展过程中始终注重民生、保障民生、改善民生。',a:true}
+ ],
+ qa:[
+  {q:'试论述如何不断提高人民生活品质？（第十一章）',a:'<p>1. 完善分配制度；</p><p>2. 实施就业优先战略；</p><p>3. 健全社会保障体系；</p><p>4. 推进健康中国建设。</p>'}
+ ]
+},
+{id:'ch12',title:'第十二章',sub:'建设美丽中国',
+ mc:[
+  {q:'（ ）是全面建设社会主义现代化国家的重要目标，也是满足人民日益增长的优美生态环境需要的必然要求',o:['依法治国','建设美丽中国','共同富裕','建设文化强国'],a:1},
+  {q:'（ ）是工业文明发展到一定阶段的产物',o:['农业文明','中华文明','生态文明','文明交流'],a:2},
+  {q:'"天地与我并生，而万物与我为一"的"天人合一"思想，代表着我们祖先对处理（ ）的关系的重要认识',o:['天与地','人与自然','人与社会','人与人'],a:1},
+  {q:'习近平指出："（ ）是最公平的公共产品，是最普惠的民生福祉。"',o:['一带一路','法律面前人人平等','良好的生态环境','按劳分配'],a:2},
+  {q:'要树立尊重自然、顺应自然、保护自然的生态文明理念，增强（ ）的意识',o:['金山银山不如绿水青山','绿水青山就是金山银山','金山银山就是绿水青山','绿水青山胜过金山银山'],a:1}
+ ],
+ tf:[
+  {q:'建设美丽中国，要从我国国情和生态文明建设的实际出发，加快形成绿色的生产方式和生活方式。',a:true},
+  {q:'生态环境保护和经济发展是矛盾对立的关系，是鱼和熊掌不可兼得的。',a:false,exp:'生态环境保护和经济发展并不对立，保护生态环境就是保护生产力，改善生态环境就是发展生产力。'},
+  {q:'人和自然是生命共同体，人与自然是一种共生关系。',a:true},
+  {q:'山水林田湖草沙是一个生命共同体，是不可分割的生态系统。',a:true},
+  {q:'生态文明主要是政府和企业的责任，人民群众只需被动享受成果。',a:false,exp:'生态文明建设是全社会的共同责任，人民群众是生态文明建设的主体。'}
+ ],
+ qa:[
+  {q:'试论述如何共建清洁美丽世界。（第十二章）',a:'<p>1. 坚持以人为本；</p><p>2. 坚持科学治理；</p><p>3. 坚持多边主义；</p><p>4. 坚持共同但有区别的责任原则。</p>'}
+ ]
+},
+{id:'ch13',title:'第十三章',sub:'总体国家安全观',
+ mc:[
+  {q:'总体国家安全观以（ ）为宗旨，坚持国家安全一切为了人民',o:['人民安全','政治安全','国内安全','国际安全'],a:0},
+  {q:'（ ）是应对国家安全形势新变化新趋势的战略选择，是全面贯彻落实总体国家安全观的重大举措',o:['统筹稳定和发展','构建新发展格局','构建新安全格局','建立强大的军队'],a:2},
+  {q:'每年（ ）被确定为全民国家安全教育日',o:['4月15日','5月17日','6月15日','7月30日'],a:0},
+  {q:'下列哪一项，不属于维护政治安全的内容（ ）',o:['维护政权安全','维护国土安全','维护制度安全','维护意识形态安全'],a:1},
+  {q:'维护意识形态安全，最主要是（ ）',o:['落实意识形态工作责任制','把意识形态工作的领导权、管理权、话语权牢牢掌握在党的手中','及时掌握意识形态形势和动态','坚持和巩固马克思主义在意识形态领域的指导地位'],a:3},
+  {q:'贯彻总体国家安全观，必须做到"五个统筹"。下列哪一项，不属于"五个统筹"的内容？',o:['统筹外部安全和内部安全','统筹经济发展和科技创新','统筹传统安全和非传统安全','统筹自身安全和共同安全'],a:1}
+ ],
+ tf:[
+  {q:'经济发展是民族复兴的根基，社会稳定是国家强盛的前提。',a:false,exp:'国家安全是民族复兴的根基，社会稳定是国家强盛的前提（原文表述）。'},
+  {q:'总体国家安全观的关键是"总体"，强调"大安全"理念。',a:true},
+  {q:'发展和安全是一体之两翼、驱动之双轮。发展是安全的基础和目的，安全是发展的条件和保障，发展和安全要同步推进。',a:true},
+  {q:'文化安全是国家安全的根本。',a:false,exp:'政治安全是国家安全的根本。'},
+  {q:'领土安全与人民群众切身利益关系最密切，是人民群众安全感的晴雨表，是社会安定的风向标。',a:false,exp:'社会安全与人民群众切身利益关系最密切。'},
+  {q:'国土安全是立国之基。国土的安全状态与国家能否繁荣息息相关。',a:true}
+ ],
+ qa:[
+  {q:'试论述总体国家安全观的"五大要素"。（第十三章）',a:'<p>1. 以人民安全为宗旨；</p><p>2. 以政治安全为根本；</p><p>3. 以经济安全为基础；</p><p>4. 以军事、文化、社会安全为保障；</p><p>5. 以促进国际安全为依托。</p>'}
+ ]
+},
+{id:'ch14',title:'第十四章',sub:'强军兴军',
+ mc:[
+  {q:'党的十八大以来，以习近平同志为核心的党中央围绕新时代（ ），深入进行理论探索和实践创造，形成习近平强军思想',o:['坚持和发展什么样的中国特色社会主义、怎样坚持和发展中国特色社会主义','建设什么样的社会主义现代化强国、怎样建设社会主义现代化强国','建设什么样的长期执政的马克思主义政党、怎样建设长期执政的马克思主义政党','建设一支什么样的强大人民军队、怎样建设强大人民军队'],a:3},
+  {q:'（ ）是党指挥枪原则落地生根的坚实基础',o:['党支部建在排上','党支部建在连上','党支部建在营上','党支部建在团上'],a:1},
+  {q:'（ ）是我军的立军之本',o:['政治建军','改革强军','科技强军','人才强军'],a:0},
+  {q:'（ ）对人民军队的绝对领导，是建军之本、强军之魂',o:['国家','政府','人民','党'],a:3}
+ ],
+ tf:[
+  {q:'党在新时代的强军目标是建设一支听党指挥、能打胜仗、作风优良的人民军队，把人民军队建设成为世界一流军队。',a:true},
+  {q:'人民军队将在本世纪中叶基本实现国防和军队现代化。',a:false,exp:'到2035年基本实现国防和军队现代化；到本世纪中叶把人民军队建成世界一流军队。'},
+  {q:'人民军队必须牢固树立战斗力这个唯一的根本的标准。',a:true},
+  {q:'军委主席负责制是坚持党对人民军队绝对领导的根本制度和根本实现形式，在党领导军队的一整套制度体系中处于最高层次、居于统领地位。',a:true},
+  {q:'科技是决定人民军队发展壮大、制胜未来的关键一招。',a:false,exp:'政治建军是立军之本，科技是重要支撑，但不是"唯一关键一招"的表述。'}
+ ],
+ qa:[
+  {q:'试论述新时代人民军队的使命任务。（第十四章）',a:'<p>1. 为巩固中国共产党领导和我国社会主义制度提供战略支撑；</p><p>2. 为捍卫国家主权、统一和领土完整提供战略支撑；</p><p>3. 为维护我国海外利益提供战略支撑；</p><p>4. 为促进世界和平与发展提供战略支撑。</p>'}
+ ]
+},
+{id:'ch15',title:'第十五章',sub:'港澳台与祖国统一',
+ mc:[
+  {q:'"一国两制"就是在统一的国家之内，国家主体实行（ ）',o:['现代化','军事工作','社会主义制度','资本主义制度'],a:2},
+  {q:'《反分裂国家法》是在（ ）颁布实施的',o:['2003年','2004年','2005年','2006年'],a:2},
+  {q:'（ ）是两岸关系的政治基础',o:['继续推进两岸"三通"','促进两岸人文交流','协商解决两岸同胞关心的问题','一个中国原则'],a:3},
+  {q:'（ ）是在一个国家、两种制度、三个关税区、三种货币的条件下建设的，是党中央立足全局和长远作出的重大决策',o:['粤港澳大湾区','珠三角经济圈','长三角经济圈','环渤海经济圈'],a:0}
+ ],
+ tf:[
+  {q:'"一国两制"的根本宗旨是维护国家主权、安全、发展利益，保持香港、澳门长期繁荣稳定。',a:true},
+  {q:'"两制"是实行"一国"的前提和基础，"两制"从属和派生于"一国"，并统一于"一国"之内。',a:false,exp:'"一国"是实行"两制"的前提和基础，"两制"从属和派生于"一国"，统一于"一国"之内。'},
+  {q:'宪法和基本法共同构成了特别行政区的宪制基础。',a:true},
+  {q:'实现祖国完全统一是全体中华儿女的共同愿望，是民族复兴的题中之义。',a:true},
+  {q:'坚持一个中国原则和"九二共识"，这是统一的政治基础。',a:true}
+ ],
+ qa:[]
+},
+{id:'ch16',title:'第十六章',sub:'构建人类命运共同体',
+ mc:[
+  {q:'下列哪一项，不属于我国推动构建新型国际关系的原则（ ）',o:['相互尊重','和谐发展','公平正义','合作共赢'],a:1},
+  {q:'坚持以（ ）为原则推动"一带一路"建设',o:['中华民族伟大复兴','维护世界和平、促进共同发展','共商共建共享','维护党中央权威'],a:2},
+  {q:'习近平在联合国日内瓦总部发表演讲，提出世界怎么了、我们怎么办？中国方案是：（ ）',o:['构建人类命运共同体','共商共建共享','和平共处','建设"一带一路"'],a:0},
+  {q:'习近平总书记多次强调，领导干部要胸怀"两个大局"。这"两个大局"指的是（ ）',o:['经济建设大局和社会稳定大局','国内发展大局和对外开放大局','中华民族伟大复兴战略全局和世界百年未有之大变局','全面深化改革大局和全面依法治国大局'],a:2}
+ ],
+ tf:[
+  {q:'习近平外交思想强调，要坚持以维护党中央权威为统领加强党对对外工作的集中统一领导。',a:true},
+  {q:'"一带一路"是指"丝绸之路经济带"和"21世纪海上丝绸之路"。',a:true},
+  {q:'推动构建人类命运共同体，是当代中国共产党人回答和解决关乎人类前途命运的时代之问的中国方案。',a:true},
+  {q:'维护国家主权、安全、发展利益是我国对外工作的出发点和落脚点，是中国外交的神圣使命。',a:true},
+  {q:'中国共产党秉持求同存异、相互尊重、互学互鉴的理念，致力于构建新型政党关系。',a:true}
+ ],
+ qa:[
+  {q:'试论述如何构建人类命运共同体。（第十六章）',a:'<p>1. 坚持对话协商，建设持久和平的世界；</p><p>2. 坚持共建共享，建设普遍安全的世界；</p><p>3. 坚持合作共赢，建设共同繁荣的世界；</p><p>4. 坚持交流互鉴，建设开放包容的世界；</p><p>5. 坚持绿色低碳，建设清洁美丽的世界。</p>'}
+ ]
+},
+{id:'ch17',title:'第十七章',sub:'党的自我革命与全面从严治党',
+ mc:[
+  {q:'下列哪一项，不属于新时代好干部标准（ ）',o:['甘于奉献','为民服务','勤政务实','清正廉洁'],a:0},
+  {q:'新形势下党执政面临的"四大危险"不包括（ ）',o:['能力不足危险','脱离群众危险','消极腐败危险','动力不足危险'],a:3},
+  {q:'新形势下党执政面临的"四大考验"不包括（ ）',o:['改革开放考验','市场经济考验','外部环境考验','管党治党考验'],a:3}
+ ],
+ tf:[
+  {q:'政治建设是党永葆生机活力、走好新的赶考之路的必由之路。',a:false,exp:'自我革命是党永葆生机活力、走好新的赶考之路的必由之路。'},
+  {q:'全面从严治党，核心是加强党的领导，基础在全面，关键在严，要害在治。',a:true},
+  {q:'保证全党服从中央，维护党中央权威和集中统一领导，是党的政治建设的首要任务。',a:true},
+  {q:'党的作风问题核心是党同人民群众的关系问题。',a:true}
+ ],
+ qa:[
+  {q:'试论述新形势下党面临的"四大考验"和"四种危险"分别是什么？（第十七章）',a:'<p><strong>"四大考验"：</strong>长期执政考验、改革开放考验、市场经济考验、外部环境考验。</p><p><strong>"四种危险"：</strong>精神懈怠危险、能力不足危险、脱离群众危险、消极腐败危险。</p>'}
+ ]
+}
+];
+
+// Build questions array for each chapter
+CHAPTERS.forEach(ch => {
+  ch.questions = [];
+  (ch.mc||[]).forEach(q => ch.questions.push({...q, type:'mc'}));
+  (ch.tf||[]).forEach(q => ch.questions.push({...q, type:'tf'}));
+  (ch.qa||[]).forEach(q => ch.questions.push({...q, type:'qa'}));
+});
+
+const LS_KEY = 'xs_answers';
+let answers = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+let curChap = 0, curQ = 0;
+
+function saveAnswers(){localStorage.setItem(LS_KEY,JSON.stringify(answers));}
+
+function getChapKey(ci,qi){return `${ci}-${qi}`;}
+
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function renderHome(){
+  const grid = document.getElementById('chapterGrid');
+  grid.innerHTML = CHAPTERS.map((ch,i)=>{
+    const qs = ch.questions;
+    const total = qs.length;
+    const mcCount = ch.mc?.length||0, tfCount = ch.tf?.length||0, qaCount = ch.qa?.length||0;
+    let answered=0, correct=0;
+    qs.forEach((_,qi)=>{
+      const k = getChapKey(i,qi);
+      if(answers[k]!==undefined){answered++;if(answers[k].correct)correct++;}
+    });
+    const pct = total?Math.round(answered/total*100):0;
+    const scorePct = answered?(Math.round(correct/answered*100)):null;
+    return `<div class="ch-card" onclick="startChapter(${i})">
+      <div class="ch-num">${i===0?'导':ch.title.replace('第','').replace('章','')}</div>
+      <h3>${ch.title}${ch.sub?'<br><small style="color:var(--muted);font-size:.8rem">'+ ch.sub +'</small>':''}</h3>
+      <div class="meta">单选×${mcCount} 判断×${tfCount} 论述×${qaCount}</div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+      <div class="score-label">已答 <span>${answered}/${total}</span>${scorePct!==null?' · 正确率 <span>'+scorePct+'%</span>':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function startChapter(ci){
+  curChap=ci; curQ=0;
+  show('page-quiz');
+  renderQ();
+}
+
+function renderQ(){
+  const ch = CHAPTERS[curChap];
+  const qs = ch.questions;
+  const q = qs[curQ];
+  const total = qs.length;
+  const key = getChapKey(curChap,curQ);
+  const prev = answers[key];
+
+  document.getElementById('qChapTitle').textContent = ch.title + (ch.sub?' · '+ch.sub:'');
+  document.getElementById('qProgText').textContent = `第 ${curQ+1} 题 / 共 ${total} 题`;
+  document.getElementById('topBar').style.width = ((curQ+1)/total*100)+'%';
+  document.getElementById('prevBtn').disabled = curQ===0;
+  document.getElementById('nextBtn').disabled = prev===undefined && q.type!=='qa';
+
+  const card = document.getElementById('qCard');
+  if(q.type==='mc'){
+    card.innerHTML = `
+      <span class="type-badge mc">单选题</span>
+      <div class="q-text">${q.q}</div>
+      <div class="opts">${q.o.map((opt,i)=>{
+        let cls='opt-btn';
+        if(prev!==undefined){
+          if(i===q.a) cls+=' show-correct';
+          if(prev.chosen===i && prev.chosen!==q.a) cls+=' wrong';
+          else if(prev.chosen===i) cls+=' correct';
+        }
+        return `<button class="${cls}" onclick="answerMC(${i})" ${prev!==undefined?'disabled':''}>${'ABCD'[i]}. ${opt}</button>`;
+      }).join('')}</div>
+      <div class="exp-panel ${prev!==undefined?'show':''}" id="expPanel">
+        <p>✓ 正确答案：${'ABCD'[q.a]}. ${q.o[q.a]}</p>
+        ${q.exp?'<p>'+q.exp+'</p>':''}
+      </div>`;
+  } else if(q.type==='tf'){
+    const trueLabel='✓ 正确', falseLabel='✗ 错误';
+    let trueCls='tf-btn', falseCls='tf-btn';
+    let hint='';
+    if(prev!==undefined){
+      if(q.a===true){ trueCls+=' show-correct'; if(prev.chosen===false) falseCls+=' wrong';}
+      else { falseCls+=' show-correct'; if(prev.chosen===true) trueCls+=' wrong';}
+      hint = `<div class="tf-result-hint">正确答案：<span class="correct-ans">${q.a?'✓ 正确':'✗ 错误'}</span>${q.exp?' · '+q.exp:''}</div>`;
+    }
+    card.innerHTML = `
+      <span class="type-badge tf">判断题</span>
+      <div class="q-text">${q.q}</div>
+      <div class="tf-opts">
+        <button class="${trueCls}" onclick="answerTF(true)" ${prev!==undefined?'disabled':''}>${trueLabel}</button>
+        <button class="${falseCls}" onclick="answerTF(false)" ${prev!==undefined?'disabled':''}>${falseLabel}</button>
+      </div>
+      ${hint}`;
+  } else {
+    const seen = prev!==undefined;
+    card.innerHTML = `
+      <span class="type-badge qa">论述题</span>
+      <div class="q-text">${q.q}</div>
+      <button class="reveal-btn" onclick="revealQA()" ${seen?'style="display:none"':''}>查看参考答案 ▼</button>
+      <div class="answer-box ${seen?'show':''}" id="ansBox">${q.a}</div>`;
+    if(!seen) document.getElementById('nextBtn').disabled = false;
+  }
+}
+
+function answerMC(chosen){
+  const q = CHAPTERS[curChap].questions[curQ];
+  const correct = chosen === q.a;
+  const key = getChapKey(curChap,curQ);
+  answers[key] = {chosen, correct, type:'mc'};
+  saveAnswers();
+  renderQ();
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function answerTF(val){
+  const q = CHAPTERS[curChap].questions[curQ];
+  const correct = val === q.a;
+  const key = getChapKey(curChap,curQ);
+  answers[key] = {chosen:val, correct, type:'tf'};
+  saveAnswers();
+  renderQ();
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function revealQA(){
+  const key = getChapKey(curChap,curQ);
+  answers[key] = {correct:true, type:'qa'};
+  saveAnswers();
+  document.querySelector('.reveal-btn').style.display='none';
+  document.getElementById('ansBox').classList.add('show');
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function nextQ(){
+  const qs = CHAPTERS[curChap].questions;
+  if(curQ < qs.length-1){ curQ++; renderQ(); }
+  else { showResults(); }
+}
+
+function prevQ(){
+  if(curQ>0){ curQ--; renderQ(); }
+}
+
+function showResults(){
+  const ch = CHAPTERS[curChap];
+  const qs = ch.questions;
+  let mc_c=0,mc_t=0,tf_c=0,tf_t=0,qa_t=0;
+  qs.forEach((q,qi)=>{
+    const k=getChapKey(curChap,qi);
+    const a=answers[k];
+    if(q.type==='mc'){mc_t++;if(a?.correct)mc_c++;}
+    else if(q.type==='tf'){tf_t++;if(a?.correct)tf_c++;}
+    else{qa_t++;}
+  });
+  const scored=mc_c+tf_c, total_scored=mc_t+tf_t;
+  document.getElementById('resChapName').textContent = ch.title + (ch.sub?' · '+ch.sub:'');
+  document.getElementById('resBig').textContent = total_scored>0?Math.round(scored/total_scored*100)+'%':'—';
+  document.getElementById('resDetail').textContent =
+    `单选 ${mc_c}/${mc_t} · 判断 ${tf_c}/${tf_t} · 论述 ${qa_t}题已查看`;
+  show('page-results');
+  renderHome();
+}
+
+function retryChap(){
+  const qs = CHAPTERS[curChap].questions;
+  qs.forEach((_,qi)=>{ delete answers[getChapKey(curChap,qi)]; });
+  saveAnswers();
+  startChapter(curChap);
+}
+
+function goHome(){ show('page-home'); renderHome(); }
+
+function resetAll(){
+  if(!confirm('确定重置所有答题记录？')) return;
+  answers={};
+  saveAnswers();
+  renderHome();
+}
+
+renderHome();
+</script>
+</body>
+</html>
